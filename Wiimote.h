@@ -10,8 +10,11 @@
 
 class Wiimote: Controller {
     friend class Controller;
-    std::string extension;
+    std::string extension_name;
+    Controller* extension;
     Wiimote(const std::string &name, const std::string&, sol::table &dev);
+public:
+    bool try_to_use_device(struct udev*, struct udev_device*);
 
 };
 

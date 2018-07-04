@@ -44,15 +44,23 @@ int main(int argc, char *argv[]) {
         sol::table lua_dev = device.second;
         Controller::create(name,lua_dev);
     }
+    //TODO: we should probably disable the ability to have wii remotes without extensions when specific extensions are specified.
+    //TODO: otherwise, disconnecting and connecting a controller would let remotes jump between devices, which doesnt really make any sense.
     udev_list_entry_foreach(dev_list_entry, device_list) {
-        const char* path = udev_list_entry_get_name(dev_list_entry);
+        const char *path = udev_list_entry_get_name(dev_list_entry);
         dev = udev_device_new_from_syspath(udev, path);
-        for (auto &device : devices) {
-            sol::table lua_dev = device.second;
-            Controller c = lua_dev["dev"];
-            c.try_to_use_device(udev, dev);
+        std::string dev_name = udev_device_get_sysname(dev);
+        if (dev_name.find("event") != std::string::npos) {
+            for (auto &device : devices) {
+                sol::table lua_dev = device.second;
+                Controller& c = lua_dev["dev"];
+                if (c.try_to_use_device(udev, dev)) {
+                    break;
+                }
+            }
         }
         udev_device_unref(dev);
+
     }
     /* free enumerate */
     udev_enumerate_unref(enumerate);

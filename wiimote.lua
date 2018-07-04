@@ -1,6 +1,6 @@
 devices = {
     drums0 = {
-        type = "Nintendo Wii Remote",
+        type = "Wii",
         extension = "Drums"
     }
 }
