@@ -10,6 +10,7 @@
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "buttons_ref.h"
 
 Controller::Controller(const std::string &lua_name, const std::string &name, sol::table &lua_table) {
     this->lua_table = lua_table;
@@ -86,6 +87,39 @@ void Controller::disconnect() {
     if (isValid()) {
         libevdev_free(dev);
         close(fd);
+    }
+
+}
+
+int scale(int x, int in_min, int in_max, int out_min, int out_max) {
+    return static_cast<int>(std::floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min));
+}
+
+int Controller::get_axis_min(uint type) {
+    return libevdev_get_abs_minimum(dev, type);
+}
+
+int Controller::get_axis_max(uint type) {
+    return libevdev_get_abs_maximum(dev, type);
+}
+void Controller::tick(sol::state& lua) {
+    if (!isValid()) return;
+    int rc;
+    struct input_event ev{};
+    rc = libevdev_next_event(dev, LIBEVDEV_READ_FLAG_NORMAL, &ev);
+    if (rc == 0) {
+        if (ev.type == EV_KEY) {
+            auto func = lua["button_event"];
+            if (func != nullptr) {
+                func(lua_name, lua_table, buttonTypeBindings[ev.code], ev.value==1);
+            }
+        }
+        if (ev.type == EV_ABS) {
+            auto func = lua["axis_event"];
+            if (func != nullptr) {
+                func(lua_name, lua_table, axisTypeBindings[ev.code], scale(ev.value, get_axis_min(ev.code), get_axis_max(ev.code), MIN_ABS_VAL, MAX_ABS_VAL));
+            }
+        }
     }
 
 }

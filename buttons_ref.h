@@ -6,7 +6,7 @@
 #define BUTTONS_SIZE        53
 #define AXES_SIZE        19
 #define MAX_ABS_VAL      32767
-#define MIN_ABS_VAL      -32767
+#define MIN_ABS_VAL      (-32767)
 
 namespace buttons_ref {
     static const uint16_t BUTTONS[] =

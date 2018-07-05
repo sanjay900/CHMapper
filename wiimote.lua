@@ -32,6 +32,13 @@ v_devices = {
     }
 }
 count = 0
+function string.starts(String,Start)
+    return string.sub(String,1,string.len(Start))==Start
+end
+
+function string.ends(String,End)
+    return End=='' or string.sub(String,-string.len(End))==End
+end
 function tick(msec)
     count = count + msec
     if count%10 == 0 then
@@ -43,37 +50,42 @@ end
 function test()
     v_devices["vdrums0"].send_button(count%9, count >= 9)
 end
-function axis_event(device, axis, value)
-    if startsWith(device,"guitar") then
-        local vDev = "v"..device;
-        v_devices[vDev].send_axis(axis,value)
-    elseif startsWith(device,"drums") then
-        local vDev = "v"..device;
+function axis_event(name, device, axis, value)
+    if not string.ends(name,"_ext") then
+        return
+    end
+    name = string.gsub(name, "_ext", "")
+    local vDev = v_devices["v"..name];
+    if string.starts(name,"guitar") then
+        vDev.send_axis(axis,value)
+    elseif string.starts(name,"drums") then
         if axis < 2 then
-            v_devices[vDev].send_axis(axis,value)
+            vDev.send_axis(axis,value)
         else
             if value > -32767 then
-                v_devices[vDev].send_button(axis,true)
-                send_button_event(vDev, axis, 1)
+                vDev.send_button(axis,true)
                 count = 0
             else
-                v_devices[vDev].send_button(axis,false)
+                vDev.send_button(axis,false)
             end
         end
     end
 end
 
 
-function button_event(device, button, value)
-    if startsWith(device,"guitar") then
-        local vDev = "v"..device;
+function button_event(name, device, button, value)
+    if not string.ends(name,"_ext") then
+        return
+    end
+    name = string.gsub(name, "_ext", "")
+    local vDev = v_devices["v"..name];
+    if string.starts(name,"guitar") then
         if button >= 2 then
-            v_devices[vDev].send_button(button - 2, value)
+            vDev.send_button(button - 2, value)
         else
-            v_devices[vDev].send_button(button + 7, value)
+            vDev.send_button(button + 7, value)
         end
-    elseif startsWith(device,"drums") then
-        local vDev = "v"..device;
-        v_devices[vDev].send_button(button, value)
+    elseif string.starts(name,"drums") then
+        vDev.send_button(button, value)
     end
 end

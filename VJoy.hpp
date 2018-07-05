@@ -10,14 +10,14 @@ class VJoy {
     uint axes;
     uint buttons;
     uint64_t buttonFlags = 0;
-    std::vector<uint16_t> axesData;
+    std::vector<int> axesData;
     sol::table lua_table;
     std::string lua_name;
     void send_button_event(uint, bool);
 
-    void send_axis_event(uint, uint16_t);
+    void send_axis_event(uint, int);
     bool get_button_status(int);
-    uint16_t get_axis_status(int t) { return axesData[t]; };
+    int get_axis_status(int t) { return axesData[t]; };
 public:
     VJoy(const std::string &lua_name, sol::table &lua_table);
     ~VJoy();

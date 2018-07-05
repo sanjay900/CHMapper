@@ -32,7 +32,8 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
         std::string name = "Nintendo Wii Remote " + extension_name;
         new_table["type"] = name;
     }
-    extension = Controller::create(name,new_table);
+    std::string ext_name = lua_name+"_ext";
+    extension = Controller::create(ext_name,new_table);
     udev_list_entry_foreach(entry, devices) {
         const char *path = udev_list_entry_get_name(entry);
         entry_dev = udev_device_new_from_syspath(udev, path);
@@ -53,4 +54,9 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
 
     udev_enumerate_unref(enumerate);
     return true;
+}
+
+void Wiimote::tick(sol::state &lua) {
+    Controller::tick(lua);
+    extension->tick(lua);
 }

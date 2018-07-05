@@ -59,7 +59,7 @@ VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_t
 
     std::cout << "Successfully created virtual device " << lua_name << ".\n";
     lua_table["send_button"] = [&](uint type, bool value) { return send_button_event(type, value); };
-    lua_table["send_axis"] = [&](uint type, uint16_t value) { return send_axis_event(type, value); };
+    lua_table["send_axis"] = [&](uint type, int value) { return send_axis_event(type, value); };
     lua_table["get_button"] = [&](uint type) { return get_button_status(type); };
     lua_table["get_axis"] = [&](uint type) { return get_axis_status(type); };
     lua_table["axis_max"] = MAX_ABS_VAL;
@@ -83,7 +83,7 @@ void VJoy::send_button_event(uint type, bool value) {
     libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
 }
 
-void VJoy::send_axis_event(uint type, uint16_t value) {
+void VJoy::send_axis_event(uint type, int value) {
     axesData[type] = value;
     libevdev_uinput_write_event(uidev, EV_ABS, buttons_ref::AXES[type], value);
     libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);

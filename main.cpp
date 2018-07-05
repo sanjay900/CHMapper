@@ -10,7 +10,7 @@
 int main(int argc, char *argv[]) {
     sol::state lua;
     // open some common libraries
-    lua.open_libraries(sol::lib::base, sol::lib::package);
+    lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string);
     if (argc < 0) {
         std::cerr << "A script is required as the first argument" << std::endl;
     }
@@ -76,7 +76,12 @@ int main(int argc, char *argv[]) {
     /* free udev */
     udev_unref(udev);
     while(true) {
-        lua["test"]();
+        for (auto &device : devices) {
+            auto name = device.first.as<std::string>();
+            sol::table lua_dev = device.second;
+            Controller& c = lua_dev["dev"];
+            c.tick(lua);
+        }
     }
 
     return 0;

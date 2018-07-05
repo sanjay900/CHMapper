@@ -20,6 +20,10 @@ class Controller {
     std::map<int,int> buttonTypeBindings;
     std::vector<int> axisBindings;
     std::map<int,int> axisTypeBindings;
+
+    int get_axis_min(uint type);
+
+    int get_axis_max(uint type);
 protected:
     Controller(const std::string&, const std::string&, sol::table&);
 public:
@@ -34,6 +38,7 @@ public:
     bool isValid() const;
 
     void initMaps();
+    virtual void tick(sol::state &lua);
 };
 
 
