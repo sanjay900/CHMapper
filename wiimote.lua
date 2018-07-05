@@ -40,20 +40,24 @@ function tick(msec)
         end
     end
 end
+function test()
+    v_devices["vdrums0"].send_button(count%9, count >= 9)
+end
 function axis_event(device, axis, value)
     if startsWith(device,"guitar") then
         local vDev = "v"..device;
-        send_axis_event(vDev, axis, value)
+        v_devices[vDev].send_axis(axis,value)
     elseif startsWith(device,"drums") then
         local vDev = "v"..device;
         if axis < 2 then
-            send_axis_event(vDev, axis, value)
+            v_devices[vDev].send_axis(axis,value)
         else
             if value > -32767 then
+                v_devices[vDev].send_button(axis,true)
                 send_button_event(vDev, axis, 1)
                 count = 0
             else
-                send_button_event(vDev, axis, 0)
+                v_devices[vDev].send_button(axis,false)
             end
         end
     end
@@ -64,12 +68,12 @@ function button_event(device, button, value)
     if startsWith(device,"guitar") then
         local vDev = "v"..device;
         if button >= 2 then
-            send_button_event(vDev, button - 2, value)
+            v_devices[vDev].send_button(button - 2, value)
         else
-            send_button_event(vDev, button + 7, value)
+            v_devices[vDev].send_button(button + 7, value)
         end
     elseif startsWith(device,"drums") then
         local vDev = "v"..device;
-        send_button_event(vDev, button, value)
+        v_devices[vDev].send_button(button, value)
     end
 end

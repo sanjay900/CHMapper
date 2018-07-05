@@ -1,8 +1,11 @@
 #include <iostream>
 #include <libudev.h>
 #include "sol.hpp"
+#include "VJoy.hpp"
 #include "Controller.hpp"
 #include "ControllerException.h"
+#include <chrono>
+#include <thread>
 
 int main(int argc, char *argv[]) {
     sol::state lua;
@@ -39,10 +42,16 @@ int main(int argc, char *argv[]) {
         throw ControllerException("Failed to get device list.");
     }
     sol::table devices = lua["devices"];
+    sol::table v_devices = lua["v_devices"];
     for (auto &device : devices) {
         auto name = device.first.as<std::string>();
         sol::table lua_dev = device.second;
-        Controller::create(name,lua_dev);
+        lua_dev["dev"] = Controller::create(name,lua_dev);
+    }
+    for (auto &device : v_devices) {
+        auto name = device.first.as<std::string>();
+        sol::table lua_dev = device.second;
+        lua_dev["dev"] = new VJoy(name,lua_dev);
     }
     //TODO: we should probably disable the ability to have wii remotes without extensions when specific extensions are specified.
     //TODO: otherwise, disconnecting and connecting a controller would let remotes jump between devices, which doesnt really make any sense.
@@ -66,6 +75,10 @@ int main(int argc, char *argv[]) {
     udev_enumerate_unref(enumerate);
     /* free udev */
     udev_unref(udev);
+    while(true) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        lua.script("test()");
+    }
 
     return 0;
 }
