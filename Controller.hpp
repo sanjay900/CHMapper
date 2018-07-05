@@ -25,7 +25,7 @@ protected:
 public:
     static Controller* create(std::string&,sol::table&);
 
-    virtual bool try_to_use_device(struct udev*, struct udev_device*);
+    virtual bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua);
     void disconnect();
     const std::string &getLua_name() const;
 

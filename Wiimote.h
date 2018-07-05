@@ -14,7 +14,7 @@ class Wiimote: Controller {
     Controller* extension;
     Wiimote(const std::string &name, const std::string&, sol::table &dev);
 public:
-    bool try_to_use_device(struct udev*, struct udev_device*);
+    bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua);
 
 };
 

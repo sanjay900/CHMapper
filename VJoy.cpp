@@ -53,7 +53,7 @@ VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_t
                                                  LIBEVDEV_UINPUT_OPEN_MANAGED,
                                                  &uidev);
     if (err != 0) {
-        throw new ControllerException(
+        throw ControllerException(
                 strerror(-err) + std::string(": Failed creating virtual device ") + lua_name + ".");
     }
 

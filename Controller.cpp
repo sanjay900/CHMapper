@@ -15,6 +15,7 @@ Controller::Controller(const std::string &lua_name, const std::string &name, sol
     this->lua_table = lua_table;
     this->lua_name = lua_name;
     this->name = name;
+    lua_table["name"] = name;
 }
 
 Controller* Controller::create(std::string &name, sol::table &lua_table) {
@@ -52,7 +53,7 @@ void Controller::initMaps() {
     }
 }
 
-bool Controller::try_to_use_device(struct udev * udev, struct udev_device * device) {
+bool Controller::try_to_use_device(struct udev * udev, struct udev_device * device, sol::state &lua) {
     if (isValid()) return false;
     const std::string devpath = "/dev/input/" + std::string(udev_device_get_sysname(device));
     int fd = open(devpath.c_str(), O_RDONLY | O_NONBLOCK);
@@ -78,7 +79,7 @@ bool Controller::try_to_use_device(struct udev * udev, struct udev_device * devi
 }
 
 bool Controller::isValid() const {
-    return fd == -1;
+    return fd != -1;
 }
 
 void Controller::disconnect() {

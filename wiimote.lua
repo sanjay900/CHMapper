@@ -1,7 +1,7 @@
 devices = {
     drums0 = {
         type = "Wii",
-        extension = "Drums"
+        extension_type = "Drums"
     }
 }
 v_devices = {

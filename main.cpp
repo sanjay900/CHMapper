@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
             for (auto &device : devices) {
                 sol::table lua_dev = device.second;
                 Controller& c = lua_dev["dev"];
-                if (c.try_to_use_device(udev, dev)) {
+                if (c.try_to_use_device(udev, dev,lua)) {
                     break;
                 }
             }
@@ -76,8 +76,7 @@ int main(int argc, char *argv[]) {
     /* free udev */
     udev_unref(udev);
     while(true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        lua.script("test()");
+        lua["test"]();
     }
 
     return 0;
