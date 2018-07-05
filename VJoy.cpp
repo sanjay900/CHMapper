@@ -1,7 +1,3 @@
-//
-// Created by sanjay on 5/07/18.
-//
-
 #include <cstdint>
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <libevdev-1.0/libevdev/libevdev-uinput.h>

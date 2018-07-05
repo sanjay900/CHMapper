@@ -39,6 +39,7 @@ public:
 
     void initMaps();
     virtual void tick(sol::state &lua);
+    ~Controller();
 };
 
 

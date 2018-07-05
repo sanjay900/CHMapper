@@ -88,8 +88,10 @@ void Controller::disconnect() {
         libevdev_free(dev);
         close(fd);
     }
-
 }
+Controller::~Controller() {
+    disconnect();
+};
 
 int scale(int x, int in_min, int in_max, int out_min, int out_max) {
     return static_cast<int>(std::floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min));

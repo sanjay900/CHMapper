@@ -39,12 +39,13 @@ end
 function string.ends(String,End)
     return End=='' or string.sub(String,-string.len(End))==End
 end
-function tick(msec)
-    count = count + msec
-    if count%10 == 0 then
+function tick(usec)
+    count = count + usec
+    if count > 100000 then
         for i = 0,9 do
-            send_button_event("vdrums0", i, 0)
+            v_devices.vdrums0.send_button(i,false)
         end
+        count = 0
     end
 end
 function test()

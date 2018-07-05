@@ -53,8 +53,6 @@ int main(int argc, char *argv[]) {
         sol::table lua_dev = device.second;
         lua_dev["dev"] = new VJoy(name,lua_dev);
     }
-    //TODO: we should probably disable the ability to have wii remotes without extensions when specific extensions are specified.
-    //TODO: otherwise, disconnecting and connecting a controller would let remotes jump between devices, which doesnt really make any sense.
     udev_list_entry_foreach(dev_list_entry, device_list) {
         const char *path = udev_list_entry_get_name(dev_list_entry);
         dev = udev_device_new_from_syspath(udev, path);
@@ -75,7 +73,15 @@ int main(int argc, char *argv[]) {
     udev_enumerate_unref(enumerate);
     /* free udev */
     udev_unref(udev);
+    long last = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+    ).count();
     while(true) {
+        long current = std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::system_clock::now().time_since_epoch()
+        ).count();
+        lua["tick"](current-last);
+        last = current;
         for (auto &device : devices) {
             auto name = device.first.as<std::string>();
             sol::table lua_dev = device.second;
