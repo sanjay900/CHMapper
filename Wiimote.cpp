@@ -51,13 +51,13 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
                 udev_device_unref(entry_dev);
                 continue;
             }
-            if (accelerometer->try_to_use_device(udev, entry_dev,lua)) {
+            if (ir->try_to_use_device(udev, entry_dev,lua)) {
                 ir_table["type"] = "IR";
                 lua_table["ir"] = ir_table;
                 udev_device_unref(entry_dev);
                 continue;
             }
-            if (ir->try_to_use_device(udev, entry_dev,lua)) {
+            if (accelerometer->try_to_use_device(udev, entry_dev,lua)) {
                 accel_table["type"] = "Accelerometer";
                 lua_table["accelerometer"] = accel_table;
                 udev_device_unref(entry_dev);
@@ -69,7 +69,6 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
                 ext_table["type"] = name;
                 lua_table["extension"] = ext_table;
                 lua_table["extension_name"] = name;
-                udev_device_unref(entry_dev);
             }
         }
         udev_device_unref(entry_dev);
@@ -80,6 +79,7 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
 }
 
 void Wiimote::tick(sol::state &lua) {
+    if (!isValid()) return;
     Controller::tick(lua);
     extension->tick(lua);
     ir->tick(lua);

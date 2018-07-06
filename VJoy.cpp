@@ -16,7 +16,6 @@ VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_t
         throw ControllerException("No axes count was defined.");
     }
     axes = a.value();
-    std::cout << "Opening virtual device " << lua_name << ".\n";
 
     //Setup buttons for device
     if (buttons >= BUTTONS_SIZE)
@@ -31,7 +30,7 @@ VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_t
                 std::string("Number of axes (") + std::to_string(axes) + ") for virtual device " + lua_name +
                 " exceeds maximum allowable axesMapping which is " + std::to_string(AXES_SIZE - 1) + ".");
     axesData.resize(axes, 0);
-    std::string dev_name = "WeJoy Virtual Device " + lua_name;
+    std::string dev_name = "SanPIE Virtual Device " + lua_name;
     struct libevdev *dev;
     dev = libevdev_new();
     libevdev_set_name(dev, dev_name.c_str());
@@ -44,7 +43,6 @@ VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_t
         absinfo.minimum = MIN_ABS_VAL;
         libevdev_enable_event_code(dev, EV_ABS, buttons_ref::AXES[i], &absinfo);
     }
-    std::cout << "Creating virtual device " << lua_name << ".\n";
     int err = libevdev_uinput_create_from_device(dev,
                                                  LIBEVDEV_UINPUT_OPEN_MANAGED,
                                                  &uidev);
@@ -53,7 +51,7 @@ VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_t
                 strerror(-err) + std::string(": Failed creating virtual device ") + lua_name + ".");
     }
 
-    std::cout << "Successfully created virtual device " << lua_name << ".\n";
+    std::cout << "Created virtual device " << lua_name << ".\n";
     lua_table["send_button"] = [&](uint type, bool value) { return send_button_event(type, value); };
     lua_table["send_axis"] = [&](uint type, int value) { return send_axis_event(type, value); };
     lua_table["get_button"] = [&](uint type) { return get_button_status(type); };

@@ -88,6 +88,7 @@ void Controller::disconnect() {
     if (isValid()) {
         libevdev_free(dev);
         close(fd);
+        fd = -1;
     }
 }
 Controller::~Controller() {
