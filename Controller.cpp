@@ -16,7 +16,8 @@ Controller::Controller(const std::string &lua_name, const std::string &name, sol
     this->lua_table = lua_table;
     this->lua_name = lua_name;
     this->name = name;
-    lua_table["name"] = name;
+    lua_table["type"] = name;
+    lua_table["name"] = lua_name;
 }
 
 Controller* Controller::create(std::string &name, sol::table &lua_table) {
@@ -113,13 +114,13 @@ void Controller::tick(sol::state& lua) {
         if (ev.type == EV_KEY) {
             auto func = lua["button_event"];
             if (func != nullptr) {
-                func(lua_name, lua_table, buttonTypeBindings[ev.code], ev.value==1);
+                func(lua_table, buttonTypeBindings[ev.code], ev.value==1);
             }
         }
         if (ev.type == EV_ABS) {
             auto func = lua["axis_event"];
             if (func != nullptr) {
-                func(lua_name, lua_table, axisTypeBindings[ev.code], scale(ev.value, get_axis_min(ev.code), get_axis_max(ev.code), MIN_ABS_VAL, MAX_ABS_VAL));
+                func(lua_table, axisTypeBindings[ev.code], scale(ev.value, get_axis_min(ev.code), get_axis_max(ev.code), MIN_ABS_VAL, MAX_ABS_VAL));
             }
         }
     }

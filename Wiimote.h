@@ -12,10 +12,14 @@ class Wiimote: Controller {
     friend class Controller;
     std::string extension_name;
     Controller* extension;
+    Controller* ir;
+    Controller* accelerometer;
+    Controller* motion_plus;
     Wiimote(const std::string &name, const std::string&, sol::table &dev);
 public:
     bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua);
     void tick(sol::state &lua);
+    ~Wiimote();
 
 };
 

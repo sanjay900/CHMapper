@@ -2,36 +2,43 @@ devices = {
     drums0 = {
         type = "Wii",
         extension_type = "Drums"
+    },
+    guitar0 = {
+        type = "Wii",
+        extension_type = "Guitar",
+    },
+    guitar1 = {
+        type = "Wii",
+        extension_type = "Guitar",
+    },
+    guitar2 = {
+        type = "Wii",
+        extension_type = "Guitar",
     }
 }
 v_devices = {
-    vguitar0 =
-    {
+    vguitar0 = {
         buttons = 9,
         axes = 6
     },
-    vguitar1 =
-    {
+    vguitar1 = {
         buttons = 9,
         axes = 6
     },
-    vguitar2 =
-    {
+    vguitar2 = {
         buttons = 9,
         axes = 6
     },
-    vguitar3 =
-    {
+    vguitar3 = {
         buttons = 9,
         axes = 6
     },
-    vdrums0 =
-    {
+    vdrums0 = {
         buttons = 9,
-        axes = 2
+        axes = 2,
+        guitar = true
     }
 }
-count = 0
 function string.starts(String,Start)
     return string.sub(String,1,string.len(Start))==Start
 end
@@ -39,46 +46,47 @@ end
 function string.ends(String,End)
     return End=='' or string.sub(String,-string.len(End))==End
 end
+count = 0
 function tick(usec)
     count = count + usec
     if count > 100000 then
-        for i = 0,9 do
-            v_devices.vdrums0.send_button(i,false)
+        for k, v in pairs(v_devices) do
+            if string.starts(k, "vguitar") and v.guitar then
+                for i = 0,v.buttons do
+                    v.send_button(i,false)
+                end
+            end
         end
         count = 0
     end
 end
-function test()
-    v_devices["vdrums0"].send_button(count%9, count >= 9)
-end
-function axis_event(name, device, axis, value)
-    if not string.ends(name,"_ext") then
-        return
-    end
-    name = string.gsub(name, "_ext", "")
+function axis_event(device, axis, value)
+    local name = device.name;
     local vDev = v_devices["v"..name];
     if string.starts(name,"guitar") then
+        if device.type == "Accelerometer" then
+            axis = axis + 3
+        end
         vDev.send_axis(axis,value)
     elseif string.starts(name,"drums") then
-        if axis < 2 then
-            vDev.send_axis(axis,value)
-        else
-            if value > -32767 then
+        if vDev.guitar then
+            if axis < 2 then
+                vDev.send_axis(axis,value)
+            elseif value > -32767 then
                 vDev.send_button(axis,true)
                 count = 0
             else
                 vDev.send_button(axis,false)
             end
+        else
+            vDev.send_axis(axis,value)
         end
     end
 end
 
 
-function button_event(name, device, button, value)
-    if not string.ends(name,"_ext") then
-        return
-    end
-    name = string.gsub(name, "_ext", "")
+function button_event(device, button, value)
+    local name = device.name;
     local vDev = v_devices["v"..name];
     if string.starts(name,"guitar") then
         if button >= 2 then
