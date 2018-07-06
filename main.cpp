@@ -4,9 +4,12 @@
 #include "VJoy.hpp"
 #include "VKeyboard.hpp"
 #include "Controller.hpp"
+#include "MIDI.hpp"
 #include "ControllerException.h"
 #include <chrono>
 #include <thread>
+#include <fcntl.h>
+#include <zconf.h>
 
 int main(int argc, char *argv[]) {
     sol::state lua;
@@ -54,6 +57,8 @@ int main(int argc, char *argv[]) {
         sol::table lua_dev = device.second;
         if (lua_dev["keyboard"]) {
             lua_dev["dev"] = new VKeyboard(name, lua_dev, lua);
+        } else if(lua_dev["midi"]) {
+            lua_dev["dev"] = new MIDI(name, lua_dev, lua);
         } else {
             lua_dev["dev"] = new VJoy(name, lua_dev);
         }

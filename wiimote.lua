@@ -20,6 +20,12 @@ v_devices = {
     key = {
         keyboard = true
     },
+    midi = {
+--        modprobe snd-virmidi snd_index=1
+--        aconnect 28 128
+        midi = true,
+        device = "/dev/midi3"
+    },
     vguitar0 = {
         buttons = 9,
         axes = 6
@@ -72,6 +78,9 @@ function axis_event(device, axis, value)
         end
         vDev.send_axis(axis,value)
     elseif string.starts(name,"drums") then
+        if value > -32767 then
+            v_devices.midi.note(1,60+axis,127)
+        end
         if vDev.guitar then
             if axis < 2 then
                 vDev.send_axis(axis,value)
@@ -90,7 +99,6 @@ end
 
 function button_event(device, button, value)
     local name = device.name;
-    print(name)
     local vDev = v_devices["v"..name];
     if string.starts(name,"guitar") then
         if button >= 2 then
