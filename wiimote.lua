@@ -90,6 +90,7 @@ end
 
 function button_event(device, button, value)
     local name = device.name;
+    print(name)
     local vDev = v_devices["v"..name];
     if string.starts(name,"guitar") then
         if button >= 2 then

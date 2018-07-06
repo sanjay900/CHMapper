@@ -27,7 +27,7 @@ Controller* Controller::create(std::string &name, sol::table &lua_table) {
     }
     std::string type = typeOpt.value();
     if (type == "Wii") {
-        return new Wiimote(name, "Nintendo Wii Remote", lua_table);
+        return new Wiimote(name, lua_table);
     }
     return new Controller(name, type, lua_table);
 }

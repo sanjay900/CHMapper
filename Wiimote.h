@@ -15,7 +15,7 @@ class Wiimote: Controller {
     Controller* ir;
     Controller* accelerometer;
     Controller* motion_plus;
-    Wiimote(const std::string &name, const std::string&, sol::table &dev);
+    Wiimote(const std::string &name, sol::table &dev);
 public:
     bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua);
     void tick(sol::state &lua);

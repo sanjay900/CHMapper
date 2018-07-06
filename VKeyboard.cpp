@@ -39,7 +39,6 @@ void VKeyboard::send_key(uint type, bool value) {
     if (get_key(type) == value)
         return;
     keyFlags[type] = value;
-    std::cout << type << value <<  std::endl;
     libevdev_uinput_write_event(uidev, EV_KEY, type, value);
     libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
 }
