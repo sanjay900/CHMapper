@@ -19,6 +19,7 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
     if (!Controller::try_to_use_device(udev,udev_device,lua)) {
         return false;
     }
+    lua_table["type"] = "Remote";
     struct udev_enumerate *enumerate = udev_enumerate_new(udev);
     //Find the parent wiimote hid device, and then start a search of its child devices
     udev_enumerate_add_match_parent(enumerate, udev_device_get_parent_with_subsystem_devtype(udev_device,"hid",nullptr));

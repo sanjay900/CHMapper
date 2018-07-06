@@ -17,6 +17,9 @@ devices = {
     }
 }
 v_devices = {
+    key = {
+        keyboard = true
+    },
     vguitar0 = {
         buttons = 9,
         axes = 6

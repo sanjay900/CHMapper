@@ -2,6 +2,7 @@
 #include <libudev.h>
 #include "sol.hpp"
 #include "VJoy.hpp"
+#include "VKeyboard.hpp"
 #include "Controller.hpp"
 #include "ControllerException.h"
 #include <chrono>
@@ -51,7 +52,11 @@ int main(int argc, char *argv[]) {
     for (auto &device : v_devices) {
         auto name = device.first.as<std::string>();
         sol::table lua_dev = device.second;
-        lua_dev["dev"] = new VJoy(name,lua_dev);
+        if (lua_dev["keyboard"]) {
+            lua_dev["dev"] = new VKeyboard(name, lua_dev, lua);
+        } else {
+            lua_dev["dev"] = new VJoy(name, lua_dev);
+        }
     }
     udev_list_entry_foreach(dev_list_entry, device_list) {
         const char *path = udev_list_entry_get_name(dev_list_entry);
