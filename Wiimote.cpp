@@ -3,6 +3,9 @@
 //
 
 #include <libudev.h>
+#include <libevdev-1.0/libevdev/libevdev.h>
+#include <fcntl.h>
+#include <zconf.h>
 #include "Wiimote.h"
 #include "ControllerException.h"
 
@@ -27,11 +30,13 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
             struct udev_list_entry *devices = udev_enumerate_get_list_entry(enumerate);
             struct udev_list_entry *entry;
             struct udev_device *entry_dev;
+            bool isCurrent  = false;
             udev_list_entry_foreach(entry, devices) {
                 const char *path = udev_list_entry_get_name(entry);
                 entry_dev = udev_device_new_from_syspath(udev, path);
                 std::string dev_name = udev_device_get_sysname(entry_dev);
-                if (dev_name.find("event") != std::string::npos) {
+                isCurrent |= dev_name == sysname;
+                if (isCurrent && dev_name.find("event") != std::string::npos) {
                     if (extension->try_to_use_device(udev, entry_dev,lua)) {
                         std::string name = extension->getName();
                         name = name.substr(std::string("Nintendo Wii Remote ").size());
@@ -47,7 +52,18 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
         }
         return false;
     }
-    if (!Controller::try_to_use_device(udev,udev_device,lua)) {
+    sysname = udev_device_get_sysname(udev_device);
+    const std::string devpath = "/dev/input/" + sysname;
+    int fd = open(devpath.c_str(), O_RDONLY | O_NONBLOCK);
+    struct libevdev *_dev = nullptr;
+    int rc = libevdev_new_from_fd(fd, &_dev);
+    if (rc < 0) {
+        close(fd);
+        return false;
+    }
+    const std::string found_name = libevdev_get_name(_dev);
+    libevdev_free(_dev);
+    if (found_name.find("Nintendo Wii") == std::string::npos) {
         return false;
     }
     struct udev_enumerate *enumerate = udev_enumerate_new(udev);
@@ -71,30 +87,34 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
     ir = Controller::create(lua_name,ir_table);
     accelerometer = Controller::create(lua_name,accel_table);
     motion_plus = Controller::create(lua_name,mp_table);
+    bool found = false;
     udev_list_entry_foreach(entry, devices) {
         const char *path = udev_list_entry_get_name(entry);
         entry_dev = udev_device_new_from_syspath(udev, path);
         std::string dev_name = udev_device_get_sysname(entry_dev);
         if (dev_name.find("event") != std::string::npos) {
-            if (motion_plus->try_to_use_device(udev, entry_dev,lua)) {
+            if (Controller::try_to_use_device(udev,entry_dev,lua)) {
+                found = true;
+            }
+            if (!motion_plus->isValid() && motion_plus->try_to_use_device(udev, entry_dev,lua)) {
                 mp_table["type"] = "Motion Plus";
                 lua_table["motion_plus"] = ir_table;
                 udev_device_unref(entry_dev);
                 continue;
             }
-            if (ir->try_to_use_device(udev, entry_dev,lua)) {
+            if (!ir->isValid() && ir->try_to_use_device(udev, entry_dev,lua)) {
                 ir_table["type"] = "IR";
                 lua_table["ir"] = ir_table;
                 udev_device_unref(entry_dev);
                 continue;
             }
-            if (accelerometer->try_to_use_device(udev, entry_dev,lua)) {
+            if (!accelerometer->isValid() && accelerometer->try_to_use_device(udev, entry_dev,lua)) {
                 accel_table["type"] = "Accelerometer";
                 lua_table["accelerometer"] = accel_table;
                 udev_device_unref(entry_dev);
                 continue;
             }
-            if (extension->try_to_use_device(udev, entry_dev,lua)) {
+            if (!extension->isValid() && extension->try_to_use_device(udev, entry_dev,lua)) {
                 std::string name = extension->getName();
                 name = name.substr(std::string("Nintendo Wii Remote ").size());
                 ext_table["type"] = name;
@@ -106,8 +126,12 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
     }
 
     udev_enumerate_unref(enumerate);
-    if (!extension_name.empty() && !extension->isValid()) {
-        disconnect(sysname);
+    if ((!extension_name.empty() && !extension->isValid()) || !found) {
+        try_disconnect(sysname);
+        extension->try_disconnect(extension->sysname);
+        ir->try_disconnect(ir->sysname);
+        accelerometer->try_disconnect(accelerometer->sysname);
+        motion_plus->try_disconnect(motion_plus->sysname);
         return false;
     }
     return true;
@@ -129,10 +153,15 @@ Wiimote::~Wiimote() {
     delete(motion_plus);
 }
 
-bool Wiimote::disconnect(std::string sysname) {
-    extension->disconnect(sysname);
-    ir->disconnect(sysname);
-    accelerometer->disconnect(sysname);
-    motion_plus->disconnect(sysname);
-    return Controller::disconnect(sysname);
+bool Wiimote::try_disconnect(const std::string &sysname) {
+    if (!isValid())
+        return false;
+    if (extension->try_disconnect(sysname)) {
+        ir->try_disconnect(ir->sysname);
+        accelerometer->try_disconnect(accelerometer->sysname);
+        motion_plus->try_disconnect(motion_plus->sysname);
+        return Controller::try_disconnect(this->sysname);
+    }
+
+    return Controller::try_disconnect(sysname);
 }

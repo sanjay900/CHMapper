@@ -40,6 +40,10 @@ const std::string &Controller::getName() const {
     return name;
 }
 void Controller::initMaps() {
+    axisTypeBindings.clear();
+    axisBindings.clear();
+    buttonTypeBindings.clear();
+    buttonBindings.clear();
     std::map<int, const char *>::iterator it;
     for (uint i = 0; i < ABS_MAX; i++) {
         if (libevdev_has_event_code(dev, EV_ABS, i)) {
@@ -85,7 +89,7 @@ bool Controller::isValid() const {
     return fd != -1;
 }
 
-bool Controller::disconnect(std::string sysname) {
+bool Controller::try_disconnect(const std::string &sysname) {
     if(isValid()) {
         if (sysname == this->sysname) {
             libevdev_free(dev);
@@ -97,7 +101,7 @@ bool Controller::disconnect(std::string sysname) {
     return false;
 }
 Controller::~Controller() {
-    disconnect(sysname);
+    try_disconnect(sysname);
 }
 int Controller::get_axis_min(uint type) {
     return libevdev_get_abs_minimum(dev, type);

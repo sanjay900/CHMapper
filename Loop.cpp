@@ -47,7 +47,7 @@ void Loop::tick() {
                             break;
                         }
                     } else if (action == "remove") {
-                        c.disconnect(sysname);
+                        c.try_disconnect(sysname);
                     }
                 }
             }
