@@ -60,6 +60,14 @@ function tick(usec)
         count = 0
     end
 end
+function disconnect_event(device)
+    local name = device.name;
+    local vDev = v_devices["v"..name];
+    if string.starts(name,"guitar") then
+        vDev.send_button(7,true)
+        vDev.send_button(7,false)
+    end
+end
 function axis_event(device, axis, value)
     local name = device.name;
     local vDev = v_devices["v"..name];

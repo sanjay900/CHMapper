@@ -127,11 +127,11 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
 
     udev_enumerate_unref(enumerate);
     if ((!extension_name.empty() && !extension->isValid()) || !found) {
-        try_disconnect(sysname);
-        extension->try_disconnect(extension->sysname);
-        ir->try_disconnect(ir->sysname);
-        accelerometer->try_disconnect(accelerometer->sysname);
-        motion_plus->try_disconnect(motion_plus->sysname);
+        try_disconnect(sysname, lua);
+        extension->try_disconnect(extension->sysname, lua);
+        ir->try_disconnect(ir->sysname, lua);
+        accelerometer->try_disconnect(accelerometer->sysname, lua);
+        motion_plus->try_disconnect(motion_plus->sysname, lua);
         return false;
     }
     return true;
@@ -153,15 +153,15 @@ Wiimote::~Wiimote() {
     delete(motion_plus);
 }
 
-bool Wiimote::try_disconnect(const std::string &sysname) {
+bool Wiimote::try_disconnect(const std::string &sysname,sol::state &lua) {
     if (!isValid())
         return false;
-    if (extension->try_disconnect(sysname)) {
-        ir->try_disconnect(ir->sysname);
-        accelerometer->try_disconnect(accelerometer->sysname);
-        motion_plus->try_disconnect(motion_plus->sysname);
-        return Controller::try_disconnect(this->sysname);
+    if (extension->try_disconnect(sysname, lua)) {
+        ir->try_disconnect(ir->sysname, lua);
+        accelerometer->try_disconnect(accelerometer->sysname, lua);
+        motion_plus->try_disconnect(motion_plus->sysname, lua);
+        return Controller::try_disconnect(this->sysname, lua);
     }
 
-    return Controller::try_disconnect(sysname);
+    return Controller::try_disconnect(sysname, lua);
 }

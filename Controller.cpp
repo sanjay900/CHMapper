@@ -89,19 +89,27 @@ bool Controller::isValid() const {
     return fd != -1;
 }
 
-bool Controller::try_disconnect(const std::string &sysname) {
+bool Controller::try_disconnect(const std::string &sysname,sol::state &lua) {
     if(isValid()) {
         if (sysname == this->sysname) {
             libevdev_free(dev);
             close(fd);
             fd = -1;
+            auto func = lua["disconnect_event"];
+            if (func != nullptr) {
+                func(lua_table);
+            }
             return true;
         }
     }
     return false;
 }
 Controller::~Controller() {
-    try_disconnect(sysname);
+    if(isValid()) {
+        libevdev_free(dev);
+        close(fd);
+        fd = -1;
+    }
 }
 int Controller::get_axis_min(uint type) {
     return libevdev_get_abs_minimum(dev, type);
