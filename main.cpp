@@ -14,7 +14,7 @@
 int main(int argc, char *argv[]) {
     sol::state lua;
     // open some common libraries
-    lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string);
+    lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::io, sol::lib::math);
     if (argc < 0) {
         std::cerr << "A script is required as the first argument" << std::endl;
     }
@@ -55,9 +55,14 @@ int main(int argc, char *argv[]) {
     for (auto &device : v_devices) {
         auto name = device.first.as<std::string>();
         sol::table lua_dev = device.second;
-        if (lua_dev["keyboard"]) {
+        sol::optional<std::string> typeOpt = lua_dev["type"];
+        std::string type = "";
+        if (typeOpt != sol::nullopt) {
+            type = typeOpt.value();
+        }
+        if (type == "keyboard") {
             lua_dev["dev"] = new VKeyboard(name, lua_dev, lua);
-        } else if(lua_dev["midi"]) {
+        } else if(type == "midi") {
             lua_dev["dev"] = new MIDI(name, lua_dev, lua);
         } else {
             lua_dev["dev"] = new VJoy(name, lua_dev);

@@ -18,12 +18,10 @@ devices = {
 }
 v_devices = {
     key = {
-        keyboard = true
+        type="keyboard",
     },
     midi = {
---        modprobe snd-virmidi snd_index=1
---        aconnect 28 128
-        midi = true,
+        type="midi",
         device = "/dev/midi3"
     },
     vguitar0 = {
@@ -48,6 +46,7 @@ v_devices = {
         guitar = true
     }
 }
+
 function string.starts(String,Start)
     return string.sub(String,1,string.len(Start))==Start
 end
@@ -69,6 +68,10 @@ function tick(usec)
         count = 0
     end
 end
+
+function math.scale(x,in_min,in_max,out_min,out_max)
+    return math.floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
+end
 function axis_event(device, axis, value)
     local name = device.name;
     local vDev = v_devices["v"..name];
@@ -78,8 +81,10 @@ function axis_event(device, axis, value)
         end
         vDev.send_axis(axis,value)
     elseif string.starts(name,"drums") then
-        if value > -32767 then
-            v_devices.midi.note(1,60+axis,127)
+        if device.type == "Drums" then
+            local vel = math.scale(value,-32767,0, 0, 127)
+            vel = math.min(127,vel)
+            v_devices.midi.note(1,50+axis,vel)
         end
         if vDev.guitar then
             if axis < 2 then

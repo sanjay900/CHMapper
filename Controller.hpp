@@ -28,7 +28,7 @@ protected:
     Controller(const std::string&, const std::string&, sol::table&);
 public:
     static Controller* create(std::string&,sol::table&);
-
+    static int scale(int x, int in_min, int in_max, int out_min, int out_max);
     virtual bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua);
     void disconnect();
     const std::string &getLua_name() const;

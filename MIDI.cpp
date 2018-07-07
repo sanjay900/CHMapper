@@ -6,6 +6,7 @@
 #include "MIDI.hpp"
 #include "buttons_ref.h"
 #include "ControllerException.h"
+#include "Controller.hpp"
 
 MIDI::MIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua) : lua_table(lua_table), lua_name(lua_name) {
 
@@ -23,10 +24,15 @@ MIDI::MIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua) 
         // step 2: write the MIDI information to the OSS device
         write(fd, data, sizeof(data));
     };
+    lua_table["note_off"] = [&](unsigned char chan, unsigned char note, unsigned char velocity) {
+        unsigned char data[3] = {0x80+chan, note, velocity};
+
+        // step 2: write the MIDI information to the OSS device
+        write(fd, data, sizeof(data));
+    };
 
 }
 
 MIDI::~MIDI() {
-    // step 3: (optional) close the OSS device
     close(fd);
 }

@@ -93,12 +93,7 @@ void Controller::disconnect() {
 }
 Controller::~Controller() {
     disconnect();
-};
-
-int scale(int x, int in_min, int in_max, int out_min, int out_max) {
-    return static_cast<int>(std::floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min));
 }
-
 int Controller::get_axis_min(uint type) {
     return libevdev_get_abs_minimum(dev, type);
 }
@@ -126,4 +121,10 @@ void Controller::tick(sol::state& lua) {
         }
     }
 
+}
+
+
+
+int Controller::scale(int x, int in_min, int in_max, int out_min, int out_max) {
+    return static_cast<int>(std::floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min));
 }
