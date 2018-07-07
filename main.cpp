@@ -20,7 +20,13 @@ int main(int argc, char *argv[]) {
         std::cerr << "A script is required as the first argument" << std::endl;
     }
     lua.script_file(argv[1]);
-
+    sol::table math = lua["math"];
+    math["scale"]=Controller::scale;
+    sol::table string = lua["string"];
+    string["starts"] = [](std::string string, std::string sub){ return string.size() >= sub.size()
+                                                                              && equal(sub.begin(), sub.end(), string.begin());};
+    string["ends"] = [](std::string string, std::string sub){ return string.size() >= sub.size()
+                                                                       && equal(sub.rbegin(), sub.rend(), string.rbegin());};
     struct udev *udev;
     struct udev_device *dev;
     struct udev_enumerate *enumerate;

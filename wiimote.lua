@@ -46,14 +46,6 @@ v_devices = {
         guitar = true
     }
 }
-
-function string.starts(String,Start)
-    return string.sub(String,1,string.len(Start))==Start
-end
-
-function string.ends(String,End)
-    return End=='' or string.sub(String,-string.len(End))==End
-end
 count = 0
 function tick(usec)
     count = count + usec
@@ -68,14 +60,9 @@ function tick(usec)
         count = 0
     end
 end
-
-function math.scale(x,in_min,in_max,out_min,out_max)
-    return math.floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
-end
 function axis_event(device, axis, value)
     local name = device.name;
     local vDev = v_devices["v"..name];
-    print(device.type)
     if string.starts(name,"guitar") then
         if device.type == "Accelerometer" then
             axis = axis + 3
