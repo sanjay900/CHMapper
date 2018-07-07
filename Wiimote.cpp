@@ -50,7 +50,9 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
 
             udev_enumerate_unref(enumerate);
         }
-        return false;
+        std::string sysname = udev_device_get_sysname(udev_device);
+
+        return this->sysname == sysname || extension->sysname == sysname || ir->sysname == sysname || motion_plus->sysname == sysname || accelerometer->sysname == sysname;
     }
     sysname = udev_device_get_sysname(udev_device);
     const std::string devpath = "/dev/input/" + sysname;
@@ -91,6 +93,7 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
     udev_list_entry_foreach(entry, devices) {
         const char *path = udev_list_entry_get_name(entry);
         entry_dev = udev_device_new_from_syspath(udev, path);
+        if (entry_dev == nullptr) continue;
         std::string dev_name = udev_device_get_sysname(entry_dev);
         if (dev_name.find("event") != std::string::npos) {
             if (Controller::try_to_use_device(udev,entry_dev,lua)) {
@@ -127,11 +130,11 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
 
     udev_enumerate_unref(enumerate);
     if ((!extension_name.empty() && !extension->isValid()) || !found) {
-        try_disconnect(sysname, lua);
-        extension->try_disconnect(extension->sysname, lua);
-        ir->try_disconnect(ir->sysname, lua);
-        accelerometer->try_disconnect(accelerometer->sysname, lua);
-        motion_plus->try_disconnect(motion_plus->sysname, lua);
+        try_disconnect(sysname, nullptr);
+        extension->try_disconnect(extension->sysname, nullptr);
+        ir->try_disconnect(ir->sysname, nullptr);
+        accelerometer->try_disconnect(accelerometer->sysname, nullptr);
+        motion_plus->try_disconnect(motion_plus->sysname, nullptr);
         return false;
     }
     return true;
@@ -153,7 +156,7 @@ Wiimote::~Wiimote() {
     delete(motion_plus);
 }
 
-bool Wiimote::try_disconnect(const std::string &sysname,sol::state &lua) {
+bool Wiimote::try_disconnect(const std::string &sysname,sol::state *lua) {
     if (!isValid())
         return false;
     if (extension->try_disconnect(sysname, lua)) {

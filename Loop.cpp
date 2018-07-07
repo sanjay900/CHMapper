@@ -59,7 +59,7 @@ void Loop::tick() {
                             break;
                         }
                     } else if (action == "remove") {
-                        c->try_disconnect(sysname, lua);
+                        c->try_disconnect(sysname, &lua);
                     }
                 }
             }

@@ -60,7 +60,9 @@ void Controller::initMaps() {
 }
 
 bool Controller::try_to_use_device(struct udev * udev, struct udev_device * device, sol::state &lua) {
-    if (isValid()) return false;
+    if (isValid()) {
+        return udev_device_get_sysname(device) == sysname;
+    }
     sysname = udev_device_get_sysname(device);
     const std::string devpath = "/dev/input/" + sysname;
     int fd = open(devpath.c_str(), O_RDONLY | O_NONBLOCK);
@@ -81,6 +83,7 @@ bool Controller::try_to_use_device(struct udev * udev, struct udev_device * devi
         }
         return true;
     }
+    sysname = "";
     close(fd);
     return false;
 }
@@ -89,15 +92,19 @@ bool Controller::isValid() const {
     return fd != -1;
 }
 
-bool Controller::try_disconnect(const std::string &sysname,sol::state &lua) {
+bool Controller::try_disconnect(const std::string &sysname,sol::state *lua) {
     if(isValid()) {
         if (sysname == this->sysname) {
+            this->sysname = "";
             libevdev_free(dev);
             close(fd);
             fd = -1;
-            auto func = lua["disconnect_event"];
-            if (func != nullptr) {
-                func(lua_table);
+            if (lua != nullptr) {
+                sol::state &s = *lua;
+                auto func = s["disconnect_event"];
+                if (func != nullptr) {
+                    func(lua_table);
+                }
             }
             return true;
         }
@@ -109,6 +116,7 @@ Controller::~Controller() {
         libevdev_free(dev);
         close(fd);
         fd = -1;
+        sysname = "";
     }
 }
 int Controller::get_axis_min(uint type) {

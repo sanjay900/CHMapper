@@ -93,6 +93,7 @@ int main(int argc, char *argv[]) {
     udev_list_entry_foreach(dev_list_entry, device_list) {
         const char *path = udev_list_entry_get_name(dev_list_entry);
         dev = udev_device_new_from_syspath(udev, path);
+        if (dev == nullptr) continue;
         std::string dev_name = udev_device_get_sysname(dev);
         if (dev_name.find("event") != std::string::npos) {
             for (auto &c : sorted_devices) {
