@@ -27,6 +27,20 @@ void Loop::tick() {
 
     int fd = udev_monitor_get_fd(mon);
     sol::table devices = lua["devices"];
+    std::vector<Controller*> sorted_devices;
+    for (auto &device : devices) {
+        sol::table lua_dev = device.second;
+        Controller &c = lua_dev["dev"];
+        sorted_devices.push_back(&c);
+    }
+
+    struct {
+        bool operator()(Controller* a, Controller* b) const
+        {
+            return a->getLua_name().compare(b->getLua_name()) < 0;
+        }
+    } sort;
+    std::sort(sorted_devices.begin(), sorted_devices.end(), sort);
     fd_set fds;
     struct timeval tm;
     tm.tv_sec = 0;
@@ -39,15 +53,13 @@ void Loop::tick() {
                 struct udev_device *dev = udev_monitor_receive_device(mon);
                 const std::string sysname = udev_device_get_sysname(dev);
                 const std::string action = udev_device_get_action(dev);
-                for (auto &device : devices) {
-                    sol::table lua_dev = device.second;
-                    Controller &c = lua_dev["dev"];
+                for (auto &c : sorted_devices) {
                     if (action == "add") {
-                        if (c.try_to_use_device(udev, dev, lua)) {
+                        if (c->try_to_use_device(udev, dev, lua)) {
                             break;
                         }
                     } else if (action == "remove") {
-                        c.try_disconnect(sysname);
+                        c->try_disconnect(sysname);
                     }
                 }
             }

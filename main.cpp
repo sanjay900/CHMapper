@@ -54,6 +54,20 @@ int main(int argc, char *argv[]) {
         lua_dev["name"] = name;
         lua_dev["dev"] = Controller::create(name,lua_dev);
     }
+    std::vector<Controller*> sorted_devices;
+    for (auto &device : devices) {
+        sol::table lua_dev = device.second;
+        Controller &c = lua_dev["dev"];
+        sorted_devices.push_back(&c);
+    }
+
+    struct {
+        bool operator()(Controller* a, Controller* b) const
+        {
+            return a->getLua_name().compare(b->getLua_name()) < 0;
+        }
+    } sort;
+    std::sort(sorted_devices.begin(), sorted_devices.end(), sort);
     for (auto &device : v_devices) {
         auto name = device.first.as<std::string>();
         sol::table lua_dev = device.second;
@@ -75,10 +89,8 @@ int main(int argc, char *argv[]) {
         dev = udev_device_new_from_syspath(udev, path);
         std::string dev_name = udev_device_get_sysname(dev);
         if (dev_name.find("event") != std::string::npos) {
-            for (auto &device : devices) {
-                sol::table lua_dev = device.second;
-                Controller& c = lua_dev["dev"];
-                if (c.try_to_use_device(udev, dev,lua)) {
+            for (auto &c : sorted_devices) {
+                if (c->try_to_use_device(udev, dev,lua)) {
                     break;
                 }
             }

@@ -75,6 +75,7 @@ end
 function axis_event(device, axis, value)
     local name = device.name;
     local vDev = v_devices["v"..name];
+    print(device.type)
     if string.starts(name,"guitar") then
         if device.type == "Accelerometer" then
             axis = axis + 3
