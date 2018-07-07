@@ -14,6 +14,7 @@ class Controller {
     sol::table lua_table;
     std::string lua_name;
     std::string name;
+    std::string sysname;
     struct libevdev *dev = nullptr;
     int fd = -1;
     std::vector<int> buttonBindings;
@@ -30,7 +31,7 @@ public:
     static Controller* create(std::string&,sol::table&);
     static int scale(int x, int in_min, int in_max, int out_min, int out_max);
     virtual bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua);
-    void disconnect();
+    virtual bool disconnect(std::string sysname);
     const std::string &getLua_name() const;
 
     const std::string &getName() const;

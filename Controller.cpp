@@ -57,7 +57,8 @@ void Controller::initMaps() {
 
 bool Controller::try_to_use_device(struct udev * udev, struct udev_device * device, sol::state &lua) {
     if (isValid()) return false;
-    const std::string devpath = "/dev/input/" + std::string(udev_device_get_sysname(device));
+    sysname = udev_device_get_sysname(device);
+    const std::string devpath = "/dev/input/" + sysname;
     int fd = open(devpath.c_str(), O_RDONLY | O_NONBLOCK);
     struct libevdev *_dev = nullptr;
     int rc = libevdev_new_from_fd(fd, &_dev);
@@ -84,15 +85,19 @@ bool Controller::isValid() const {
     return fd != -1;
 }
 
-void Controller::disconnect() {
-    if (isValid()) {
-        libevdev_free(dev);
-        close(fd);
-        fd = -1;
+bool Controller::disconnect(std::string sysname) {
+    if(isValid()) {
+        if (sysname == this->sysname) {
+            libevdev_free(dev);
+            close(fd);
+            fd = -1;
+            return true;
+        }
     }
+    return false;
 }
 Controller::~Controller() {
-    disconnect();
+    disconnect(sysname);
 }
 int Controller::get_axis_min(uint type) {
     return libevdev_get_abs_minimum(dev, type);

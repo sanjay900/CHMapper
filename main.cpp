@@ -8,6 +8,7 @@
 #include "ControllerException.h"
 #include <chrono>
 #include <thread>
+#include <Loop.h>
 #include <fcntl.h>
 #include <zconf.h>
 
@@ -50,6 +51,7 @@ int main(int argc, char *argv[]) {
     for (auto &device : devices) {
         auto name = device.first.as<std::string>();
         sol::table lua_dev = device.second;
+        lua_dev["name"] = name;
         lua_dev["dev"] = Controller::create(name,lua_dev);
     }
     for (auto &device : v_devices) {
@@ -88,22 +90,11 @@ int main(int argc, char *argv[]) {
     udev_enumerate_unref(enumerate);
     /* free udev */
     udev_unref(udev);
-    long last = std::chrono::duration_cast<std::chrono::microseconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-    ).count();
-    while(true) {
-        long current = std::chrono::duration_cast<std::chrono::microseconds>(
-                std::chrono::system_clock::now().time_since_epoch()
-        ).count();
-        lua["tick"](current-last);
-        last = current;
-        for (auto &device : devices) {
-            auto name = device.first.as<std::string>();
-            sol::table lua_dev = device.second;
-            Controller& c = lua_dev["dev"];
-            c.tick(lua);
-        }
-    }
-
+    bool running = true;
+    Loop loop = Loop(lua);
+    std::cout << "Press 'q' and then 'ENTER' to quit!\n";
+    while (getchar() != 'q');
+    loop.stop();
+    sleep(1);
     return 0;
 }

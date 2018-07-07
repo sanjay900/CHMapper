@@ -19,13 +19,13 @@ MIDI::MIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua) 
         exit(1);
     }
     lua_table["note"] = [&](unsigned char chan, unsigned char note, unsigned char velocity) {
-        unsigned char data[3] = {0x90+chan, note, velocity};
+        unsigned char data[3] = {static_cast<unsigned char>(0x90 + chan), note, velocity};
 
         // step 2: write the MIDI information to the OSS device
         write(fd, data, sizeof(data));
     };
     lua_table["note_off"] = [&](unsigned char chan, unsigned char note, unsigned char velocity) {
-        unsigned char data[3] = {0x80+chan, note, velocity};
+        unsigned char data[3] = {static_cast<unsigned char>(0x80 + chan), note, velocity};
 
         // step 2: write the MIDI information to the OSS device
         write(fd, data, sizeof(data));

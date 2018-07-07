@@ -16,8 +16,37 @@ Wiimote::Wiimote(const std::string &name, sol::table &dev): Controller(name, "Ni
 
 
 bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_device, sol::state &lua) {
-    if (isValid()) return false;
-    //If we reconnect a device, this method should probably handle reconnecting an extension.
+    if (isValid()) {
+        if (!extension->isValid()) {
+            struct udev_enumerate *enumerate = udev_enumerate_new(udev);
+            //Find the parent wiimote hid device, and then start a search of its child devices
+            udev_enumerate_add_match_parent(enumerate, udev_device_get_parent_with_subsystem_devtype(udev_device,"hid",nullptr));
+            udev_enumerate_add_match_subsystem(enumerate, "input");
+            udev_enumerate_scan_devices(enumerate);
+
+            struct udev_list_entry *devices = udev_enumerate_get_list_entry(enumerate);
+            struct udev_list_entry *entry;
+            struct udev_device *entry_dev;
+            udev_list_entry_foreach(entry, devices) {
+                const char *path = udev_list_entry_get_name(entry);
+                entry_dev = udev_device_new_from_syspath(udev, path);
+                std::string dev_name = udev_device_get_sysname(entry_dev);
+                if (dev_name.find("event") != std::string::npos) {
+                    if (extension->try_to_use_device(udev, entry_dev,lua)) {
+                        std::string name = extension->getName();
+                        name = name.substr(std::string("Nintendo Wii Remote ").size());
+                        extension->lua_table["type"] = name;
+                        lua_table["extension"] = extension->lua_table;
+                        lua_table["extension_name"] = name;
+                    }
+                }
+                udev_device_unref(entry_dev);
+            }
+
+            udev_enumerate_unref(enumerate);
+        }
+        return false;
+    }
     if (!Controller::try_to_use_device(udev,udev_device,lua)) {
         return false;
     }
@@ -78,7 +107,7 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
 
     udev_enumerate_unref(enumerate);
     if (!extension_name.empty() && !extension->isValid()) {
-        disconnect();
+        disconnect(sysname);
         return false;
     }
     return true;
@@ -98,4 +127,12 @@ Wiimote::~Wiimote() {
     delete(ir);
     delete(accelerometer);
     delete(motion_plus);
+}
+
+bool Wiimote::disconnect(std::string sysname) {
+    extension->disconnect(sysname);
+    ir->disconnect(sysname);
+    accelerometer->disconnect(sysname);
+    motion_plus->disconnect(sysname);
+    return Controller::disconnect(sysname);
 }
