@@ -24,7 +24,7 @@ devices = {
         type = "midi_serial",
         device = "/dev/ttyACM1",
         baudrate = 115200,
-        debug = true
+        debug = false
     }
 }
 v_devices = {
@@ -78,6 +78,9 @@ function midi_in_note_on(device, channel, key, velocity)
     if key >= 65 and (key-65)/2 < 9 then
         v_devices.vguitar1.send_button((key-65)/2,velocity ~= 0)
     end
+end
+function midi_in(device, param1, param2, param3)
+    v_devices.midi.write(param1, param2, param3)
 end
 function disconnect_event(device)
     local name = device.name;

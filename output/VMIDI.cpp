@@ -30,6 +30,10 @@ VMIDI::VMIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua
         // step 2: write the MIDI information to the OSS device
         write(fd, data, sizeof(data));
     };
+    lua_table["write"] = [&](unsigned char param1, unsigned char param2, unsigned char param3) {
+        unsigned char data[3] = {param1, param2, param3};
+        write(fd, data, sizeof(data));
+    };
 
 }
 

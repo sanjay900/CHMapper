@@ -15,7 +15,8 @@
 class MIDISerial: MIDI {
     friend class InputFactory;
 private:
-    char buf[3], msg[MAX_MSG_SIZE];
+    unsigned char buf[3];
+    char msg[MAX_MSG_SIZE];
     struct termios oldtio, newtio;
     speed_t baudrate;
     MIDISerial(const std::string &name, sol::table &dev);

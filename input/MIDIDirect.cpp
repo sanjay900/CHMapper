@@ -46,7 +46,7 @@ void MIDIDirect::tick(sol::state& lua) {
     midiin->getMessage( &message );
     ulong nBytes = message.size();
     if (nBytes > 0) {
-        parse_midi_command(reinterpret_cast<char *>(&message[0]), lua);
+        parse_midi_command(&message[0], lua);
     }
 
 }

@@ -16,7 +16,7 @@ class MIDI: public Controller {
     MIDI(const std::string &lua_name, const std::string &name, sol::table &dev);
 
 public:
-    void parse_midi_command(char *buf, sol::state &lua);
+    void parse_midi_command(unsigned char *buf, sol::state &lua);
 };
 
 

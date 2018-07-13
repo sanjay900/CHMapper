@@ -28,14 +28,14 @@ MIDISerial::MIDISerial(const std::string &lua_name, sol::table &lua_table): MIDI
         case 38400  : baudrate = B38400 ; break;
         case 57600  : baudrate = B57600 ; break;
         case 115200 : baudrate = B115200; break;
-        default     : throw new ControllerException("Unknown baudrate");
+        default     : throw ControllerException("Unknown baudrate");
     }
     lua_table["name"] = lua_name;
     fd = open(sysname.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0) {
         throw ControllerException("Unable to open serial port");
     }
-    struct serial_struct ser_info;
+    struct serial_struct ser_info{};
     /* save current serial port settings */
     tcgetattr(fd, &oldtio);
 
@@ -54,7 +54,7 @@ MIDISerial::MIDISerial(const std::string &lua_name, sol::table &lua_table): MIDI
 	ioctl(fd, TIOCSSERIAL, &ser_info);
 	std::cout << "Waiting for midi control signal from " << lua_name << std::endl;
 	do read(fd, buf, 1);
-    while (buf[0] >> 7 == 0);
+    while (buf[0] >> 7u == 0);
 }
 
 bool MIDISerial::try_to_use_device(struct udev * udev, struct udev_device * device, sol::state &lua) {
@@ -73,14 +73,14 @@ MIDISerial::~MIDISerial() {
 
 int i = 1;
 void MIDISerial::tick(sol::state& lua) {
-    int msglen;
+    size_t msglen;
     if (!isValid()) return;
 
     while (i < 3) {
         if (read(fd, buf+i, 1) < 0) {
             return;
         }
-        if (buf[i] >> 7 != 0) {
+        if (buf[i] >> 7u != 0) {
             /* Status byte received and will always be first bit!*/
             buf[0] = buf[i];
             i = 1;
@@ -92,7 +92,7 @@ void MIDISerial::tick(sol::state& lua) {
                 i = 3;
             } else {
                 /* Lets figure out are we done or should we read one more byte. */
-                if ((buf[0] & 0xF0) == 0xC0 || (buf[0] & 0xF0) == 0xD0) {
+                if ((buf[0] & 0xF0u) == 0xC0 || (buf[0] & 0xF0u) == 0xD0) {
                     i = 3;
                 } else {
                     i = 2;
