@@ -3,6 +3,6 @@
 //
 
 #include <string>
-#include "ControllerException.h"
+#include "ControllerException.hpp"
 
 ControllerException::ControllerException(std::string message):message_(std::move(message)){}

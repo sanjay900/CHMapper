@@ -3,12 +3,12 @@
 #include <libevdev-1.0/libevdev/libevdev-uinput.h>
 #include <fcntl.h>
 #include <zconf.h>
-#include "MIDI.hpp"
+#include "VMIDI.hpp"
 #include "buttons_ref.h"
-#include "ControllerException.h"
-#include "Controller.hpp"
+#include "ControllerException.hpp"
+#include "input/Controller.hpp"
 
-MIDI::MIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua) : lua_table(lua_table), lua_name(lua_name) {
+VMIDI::VMIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua) : lua_table(lua_table), lua_name(lua_name) {
 
     std::string device = lua_table["device"];
 
@@ -33,6 +33,6 @@ MIDI::MIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua) 
 
 }
 
-MIDI::~MIDI() {
+VMIDI::~VMIDI() {
     close(fd);
 }

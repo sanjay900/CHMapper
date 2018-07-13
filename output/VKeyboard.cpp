@@ -3,7 +3,7 @@
 #include <libevdev-1.0/libevdev/libevdev-uinput.h>
 #include "VKeyboard.hpp"
 #include "buttons_ref.h"
-#include "ControllerException.h"
+#include "ControllerException.hpp"
 
 VKeyboard::VKeyboard(const std::string &lua_name, sol::table &lua_table, sol::state& lua) : lua_table(lua_table), lua_name(lua_name) {
     std::string dev_name = "SanPIE Virtual Device " + lua_name;

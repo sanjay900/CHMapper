@@ -10,7 +10,10 @@
 #include "sol.hpp"
 
 class Controller {
+    friend class InputFactory;
     friend class Wiimote;
+    friend class MIDI;
+    friend class MIDISerial;
     sol::table lua_table;
     std::string lua_name;
     std::string name;
@@ -28,7 +31,6 @@ class Controller {
 protected:
     Controller(const std::string&, const std::string&, sol::table&);
 public:
-    static Controller* create(std::string&,sol::table&);
     static int scale(int x, int in_min, int in_max, int out_min, int out_max);
     virtual bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua);
     virtual bool try_disconnect(const std::string &sysname,sol::state *lua);
@@ -36,12 +38,20 @@ public:
 
     const std::string &getName() const;
 
-    bool isValid() const;
+    virtual bool isValid() const;
 
     void initMaps();
     virtual void tick(sol::state &lua);
 
     virtual ~Controller();
+
+    friend bool operator<(const Controller &lhs, const Controller &rhs);
+
+    friend bool operator>(const Controller &lhs, const Controller &rhs);
+
+    friend bool operator<=(const Controller &lhs, const Controller &rhs);
+
+    friend bool operator>=(const Controller &lhs, const Controller &rhs);
 };
 
 

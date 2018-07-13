@@ -9,7 +9,7 @@
 #include "Controller.hpp"
 
 class Wiimote: Controller {
-    friend class Controller;
+    friend class InputFactory;
     std::string extension_name;
     Controller* extension;
     Controller* ir;

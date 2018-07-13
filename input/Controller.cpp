@@ -1,10 +1,11 @@
 //
 // Created by sanjay on 4/07/18.
 //
-
+#include "MIDI.hpp"
+#include "SER_MIDI.hpp"
 #include "Controller.hpp"
-#include "ControllerException.h"
-#include "Wiimote.h"
+#include "ControllerException.hpp"
+#include "Wiimote.hpp"
 #include <utility>
 #include <libudev.h>
 #include <libevdev-1.0/libevdev/libevdev.h>
@@ -18,18 +19,6 @@ Controller::Controller(const std::string &lua_name, const std::string &name, sol
     this->name = name;
     lua_table["type"] = name;
     lua_table["name"] = lua_name;
-}
-
-Controller* Controller::create(std::string &name, sol::table &lua_table) {
-    sol::optional<std::string> typeOpt = lua_table["type"];
-    if (typeOpt == sol::nullopt) {
-        throw ControllerException("No type was defined.");
-    }
-    std::string type = typeOpt.value();
-    if (type == "Wii") {
-        return new Wiimote(name, lua_table);
-    }
-    return new Controller(name, type, lua_table);
 }
 
 const std::string &Controller::getLua_name() const {
@@ -152,4 +141,20 @@ void Controller::tick(sol::state& lua) {
 
 int Controller::scale(int x, int in_min, int in_max, int out_min, int out_max) {
     return static_cast<int>(std::floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min));
+}
+
+bool operator<(const Controller &lhs, const Controller &rhs) {
+    return lhs.lua_name < rhs.lua_name;
+}
+
+bool operator>(const Controller &lhs, const Controller &rhs) {
+    return rhs < lhs;
+}
+
+bool operator<=(const Controller &lhs, const Controller &rhs) {
+    return !(rhs < lhs);
+}
+
+bool operator>=(const Controller &lhs, const Controller &rhs) {
+    return !(lhs < rhs);
 }

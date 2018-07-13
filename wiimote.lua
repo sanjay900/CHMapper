@@ -1,19 +1,25 @@
 devices = {
     drums0 = {
-        type = "Wii",
+        type = "wii",
         extension_type = "Drums"
     },
     guitar0 = {
-        type = "Wii",
+        type = "wii",
         extension_type = "Guitar",
     },
     guitar1 = {
-        type = "Wii",
+        type = "wii",
         extension_type = "Guitar",
     },
     guitar2 = {
-        type = "Wii",
+        type = "wii",
         extension_type = "Guitar",
+    },
+    keys0 = {
+        type = "midi_serial",
+        device = "/dev/ttyACM1",
+        baudrate = 115200,
+        debug = false
     }
 }
 v_devices = {
@@ -58,6 +64,14 @@ function tick(usec)
             end
         end
         count = 0
+    end
+end
+function midi_in_note_on(device, channel, key, velocity)
+    if (key >= 41 and (key-41)/2 < 9) then
+        v_devices.vguitar1.send_button((key-41)/2,velocity ~= 0)
+    end
+    if key >= 65 and (key-65)/2 < 9 then
+        v_devices.vguitar1.send_button((key-65)/2,velocity ~= 0)
     end
 end
 function disconnect_event(device)
