@@ -16,10 +16,10 @@
 MIDI::MIDI(const std::string &lua_name, const std::string &name, sol::table &lua_table): Controller(lua_name, name, lua_table) {}
 void MIDI::parse_midi_command(unsigned char *buf, sol::state& lua)
 {
-    int operation, channel, param1, param2;
+    unsigned char operation, channel, param1, param2;
 
-    operation = buf[0] & 0xF0u;
-    channel   = buf[0] & 0x0Fu;
+    operation = static_cast<unsigned char>(buf[0] & 0xF0u);
+    channel   = static_cast<unsigned char>(buf[0] & 0x0Fu);
     param1    = buf[1];
     param2    = buf[2];
     auto func = lua["midi_in"];
@@ -39,7 +39,7 @@ void MIDI::parse_midi_command(unsigned char *buf, sol::state& lua)
             break;
 
         case 0x90:
-            note_function = lua["midi_in_note_on"];
+            note_function = lua["midi_in_notes_on"];
             if (note_function.valid()) {
                 note_function(lua_table, channel, param1, param2);
             }
@@ -84,7 +84,7 @@ void MIDI::parse_midi_command(unsigned char *buf, sol::state& lua)
             break;
 
         case 0xE0:
-            param1 = (param1 & 0x7Fu) + ((param2 & 0x7Fu) << 7);
+            param1 = static_cast<unsigned char>((param1 & 0x7Fu) + ((param2 & 0x7Fu) << 7u));
             note_function = lua["midi_in_pitch_bend"];
             if (note_function.valid()) {
                 note_function(lua_table, channel, param1);
