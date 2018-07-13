@@ -8,6 +8,7 @@
 #include <zconf.h>
 #include "Wiimote.hpp"
 #include "ControllerException.hpp"
+#include "input/InputFactory.hpp"
 
 Wiimote::Wiimote(const std::string &name, sol::table &dev): Controller(name, "Nintendo Wii Remote", dev) {
     sol::optional<std::string> ext = lua_table["extension_type"];
@@ -85,10 +86,10 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
         std::string name = "Nintendo Wii Remote " + extension_name;
         ext_table["type"] = name;
     }
-    extension = Controller::create(lua_name,ext_table);
-    ir = Controller::create(lua_name,ir_table);
-    accelerometer = Controller::create(lua_name,accel_table);
-    motion_plus = Controller::create(lua_name,mp_table);
+    extension = InputFactory::create(lua_name,ext_table);
+    ir = InputFactory::create(lua_name,ir_table);
+    accelerometer = InputFactory::create(lua_name,accel_table);
+    motion_plus = InputFactory::create(lua_name,mp_table);
     bool found = false;
     udev_list_entry_foreach(entry, devices) {
         const char *path = udev_list_entry_get_name(entry);

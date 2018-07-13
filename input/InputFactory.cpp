@@ -14,7 +14,7 @@ Controller* InputFactory::create(std::string &name, sol::table &lua_table) {
         return new Wiimote(name, lua_table);
     }
     if (type == "midi") {
-        return new MIDI(name, lua_table);
+        return new MIDIDirect(name, lua_table);
     }
     if (type == "midi_serial") {
         return new MIDISerial(name, lua_table);

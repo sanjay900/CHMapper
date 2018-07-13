@@ -9,10 +9,11 @@
 #include <ControllerException.hpp>
 #include "Controller.hpp"
 #include "Wiimote.hpp"
-#include "MIDI.hpp"
-#include "SER_MIDI.hpp"
+#include "MIDIDirect.hpp"
+#include "MIDISerial.hpp"
 
 class InputFactory {
+public:
     static Controller* create(std::string &name, sol::table &lua_table);
 };
 

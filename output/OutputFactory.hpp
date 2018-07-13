@@ -10,6 +10,7 @@
 #include <sol.hpp>
 
 class OutputFactory {
+public:
     static void create(std::string &name, sol::table &lua_dev, sol::state &lua);
 };
 

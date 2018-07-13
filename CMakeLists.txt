@@ -7,7 +7,7 @@ add_custom_command(
         COMMAND cat /usr/include/linux/input.h /usr/include/linux/input-event-codes.h | python ${CMAKE_CURRENT_SOURCE_DIR}/make-event-names.py > $@
 )
 
-set(LIB_SOURCE_FILES input_events.h sol.hpp input/Controller.cpp input/Controller.hpp input/Wiimote.cpp input/Wiimote.hpp ControllerException.hpp ControllerException.cpp output/VJoy.cpp output/VJoy.hpp buttons_ref.h output/VKeyboard.cpp input/SER_MIDI.cpp input/MIDI.cpp output/VMIDI.cpp Loop.cpp Loop.hpp Utils.cpp Utils.hpp DeviceScanner.cpp DeviceScanner.hpp input/InputFactory.cpp input/InputFactory.hpp output/OutputFactory.cpp output/OutputFactory.hpp)
+set(LIB_SOURCE_FILES input_events.h sol.hpp input/Controller.cpp input/Controller.hpp input/Wiimote.cpp input/Wiimote.hpp ControllerException.hpp ControllerException.cpp output/VJoy.cpp output/VJoy.hpp buttons_ref.h output/VKeyboard.cpp input/MIDISerial.cpp input/MIDIDirect.cpp output/VMIDI.cpp Loop.cpp Loop.hpp Utils.cpp Utils.hpp DeviceScanner.cpp DeviceScanner.hpp input/InputFactory.cpp input/InputFactory.hpp output/OutputFactory.cpp output/OutputFactory.hpp input/MIDI.cpp)
 add_library(libsanpie ${LIB_SOURCE_FILES})
 
 target_compile_features(libsanpie PUBLIC cxx_std_17)

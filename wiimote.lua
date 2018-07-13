@@ -15,11 +15,16 @@ devices = {
         type = "wii",
         extension_type = "Guitar",
     },
+--    keys0 = {
+--        type = "midi",
+--        device = "Serial->MIDI:RtMidi Output 129:0",
+--        debug = true
+--    },
     keys0 = {
         type = "midi_serial",
         device = "/dev/ttyACM1",
         baudrate = 115200,
-        debug = false
+        debug = true
     }
 }
 v_devices = {

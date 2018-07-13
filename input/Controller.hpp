@@ -12,6 +12,7 @@
 class Controller {
     friend class InputFactory;
     friend class Wiimote;
+    friend class MIDIDirect;
     friend class MIDI;
     friend class MIDISerial;
     sol::table lua_table;

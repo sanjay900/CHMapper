@@ -1,8 +1,8 @@
 //
 // Created by sanjay on 4/07/18.
 //
-#include "MIDI.hpp"
-#include "SER_MIDI.hpp"
+#include "MIDIDirect.hpp"
+#include "MIDISerial.hpp"
 #include "Controller.hpp"
 #include "ControllerException.hpp"
 #include "Wiimote.hpp"
