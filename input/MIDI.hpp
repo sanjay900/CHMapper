@@ -14,7 +14,8 @@ class MIDI: public Controller {
     friend class MIDISerial;
     bool debug;
     MIDI(const std::string &lua_name, const std::string &name, sol::table &dev);
-
+    static int padding;
+    static std::map<unsigned char, std::string> func_map;
 public:
     void parse_midi_command(unsigned char *buf, sol::state &lua);
 };

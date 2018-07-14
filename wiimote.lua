@@ -22,7 +22,7 @@ devices = {
 --    },
     keys0 = {
         type = "midi_serial",
-        device = "/dev/ttyACM1",
+        device = "/dev/ttyACM0",
         baudrate = 115200,
         debug = false
     }

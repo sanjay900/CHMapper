@@ -14,6 +14,13 @@
 #include "buttons_ref.h"
 
 MIDI::MIDI(const std::string &lua_name, const std::string &name, sol::table &lua_table): Controller(lua_name, name, lua_table) {}
+int MIDI::padding = 20;
+std::map<unsigned char, std::string> MIDI::func_map {
+        {0x80, "note_off"},{0x90, "note_on"},{0xA0, "pressure_change"},
+        {0xB0, "controller_change"},{0xC0, "program_change"},
+        {0xD0, "channel_change"},{0xE0, "pitch_bend"},
+        {0xF0, "sys_ex"}
+};
 void MIDI::parse_midi_command(unsigned char *buf, sol::state& lua)
 {
     unsigned char operation, channel, param1, param2;
@@ -27,80 +34,33 @@ void MIDI::parse_midi_command(unsigned char *buf, sol::state& lua)
         func(lua_table, buf[0], buf[1], buf[2]);
     }
     sol::function note_function;
-    switch (operation)
-    {
-        case 0x80:
-            note_function = lua["midi_in_note_off"];
-            if (note_function.valid()) {
-                note_function(lua_table, channel, param1, param2);
+    std::string func_name = func_map[operation];
+    if (func_name.empty()) {
+        func_name = "unknown";
+    }
+    if (debug) {
+        std::string debug_name = func_name;
+        std::string temp_string;
+        std::transform(debug_name.begin(), debug_name.begin()+1, debug_name.begin(), toupper);
+        for (uint x = 0; x < debug_name.length(); x++){
+            if (debug_name[x] == '_'){
+                temp_string = debug_name.substr(x + 1, 1);
+                std::transform(temp_string.begin(), temp_string.end(), temp_string.begin(), toupper);
+                debug_name.erase(x, 2);
+                debug_name.insert(x, " "+temp_string);
             }
-            if (debug)
-                printf("%s  0x%x Note off           %03u %03u %03u\n", lua_name.c_str(), operation, channel, param1, param2);
-            break;
-
-        case 0x90:
-            note_function = lua["midi_in_notes_on"];
-            if (note_function.valid()) {
-                note_function(lua_table, channel, param1, param2);
-            }
-            if (debug)
-                printf("%s  0x%x Note on            %03u %03u %03u\n", lua_name.c_str(),operation, channel, param1, param2);
-            break;
-
-        case 0xA0:
-            note_function = lua["midi_in_pressure_change"];
-            if (note_function.valid()) {
-                note_function(lua_table, channel, param1, param2);
-            }
-            if (debug)
-                printf("%s  0x%x Pressure change    %03u %03u %03u\n", lua_name.c_str(),operation, channel, param1, param2);
-            break;
-
-        case 0xB0:
-            note_function = lua["midi_in_controller_change"];
-            if (note_function.valid()) {
-                note_function(lua_table, channel, param1, param2);
-            }
-            if (debug)
-                printf("%s  0x%x Controller change  %03u %03u %03u\n", lua_name.c_str(),operation, channel, param1, param2);
-            break;
-
-        case 0xC0:
-            note_function = lua["midi_in_program_change"];
-            if (note_function.valid()) {
-                note_function(lua_table, channel, param1);
-            }
-            if (debug)
-                printf("%s  0x%x Program change     %03u %03u\n", lua_name.c_str(),operation, channel, param1);
-            break;
-
-        case 0xD0:
-            note_function = lua["midi_in_channel_change"];
-            if (note_function.valid()) {
-                note_function(lua_table, channel, param1);
-            }
-            if (debug)
-                printf("%s  0x%x Channel change     %03u %03u\n", lua_name.c_str(),operation, channel, param1);
-            break;
-
-        case 0xE0:
+        }
+        if (operation >= 0xC0 && operation <= 0xD0) {
+            printf("%s\t0x%x\t%-*s%03u %03u\n",lua_name.c_str(), operation, padding, debug_name.c_str(), channel, param1);
+        } else if (operation == 0xE0) {
             param1 = static_cast<unsigned char>((param1 & 0x7Fu) + ((param2 & 0x7Fu) << 7u));
-            note_function = lua["midi_in_pitch_bend"];
-            if (note_function.valid()) {
-                note_function(lua_table, channel, param1);
-            }
-            if (debug)
-                printf("%s  0x%x Pitch bend         %03u %05i\n", lua_name.c_str(),operation, channel, param1);
-            break;
-
-            /* Not implementing system commands (0xF0) */
-        case 0xF0:
-            if (debug)
-                printf("%s  0x%x Unknown SysEx      %03u %03u %03u\n", lua_name.c_str(), operation, channel, param1, param2);
-            break;
-        default:
-            if (debug)
-                printf("%s  0x%x Unknown MIDI cmd   %03u %03u %03u\n", lua_name.c_str(), operation, channel, param1, param2);
-            break;
+            printf("%s\t0x%x\t%-*s%03u %03u %05i\n",lua_name.c_str(), operation, padding, debug_name.c_str(), channel, param1, param2);
+        } else {
+            printf("%s\t0x%x\t%-*s%03u %03u %03u\n",lua_name.c_str(), operation, padding, debug_name.c_str(), channel, param1, param2);
+        }
+    }
+    note_function = lua["midi_in_"+func_name];
+    if (note_function.valid()) {
+        note_function(lua_table, channel, param1, param2);
     }
 }

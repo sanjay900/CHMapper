@@ -15,7 +15,7 @@ VMIDI::VMIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua
     // step 1: open the OSS device for writing
     fd = open(device.c_str(), O_WRONLY, 0);
     if (fd < 0) {
-        printf("Error: cannot open %s\n", device);
+        printf("Error: cannot open %s\n", device.c_str());
         exit(1);
     }
     lua_table["note"] = [&](unsigned char chan, unsigned char note, unsigned char velocity) {
