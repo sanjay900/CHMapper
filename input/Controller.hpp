@@ -16,7 +16,7 @@ class Controller : public Input {
     std::map<int,int> buttonTypeBindings;
     std::vector<int> axisBindings;
     std::map<int,int> axisTypeBindings;
-
+    int fd;
     int get_axis_min(uint type);
 
     int get_axis_max(uint type);

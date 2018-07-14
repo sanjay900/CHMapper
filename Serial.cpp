@@ -1,32 +1,22 @@
 //
-// Created by sanjay on 14/07/18.
+// Created by sanjay on 15/07/18.
 //
 
-#include <DeviceException.hpp>
 #include <fcntl.h>
 #include <linux/serial.h>
-#include <termio.h>
+#include <strings.h>
+#include <asm/ioctls.h>
+#include <stropts.h>
+#include <curses.h>
 #include <zconf.h>
 #include "Serial.hpp"
+#include "DeviceException.hpp"
+#include "sol.hpp"
 
-bool Serial::try_to_use_device(struct udev *, struct udev_device *, sol::state &lua) {
-    return false;
+bool Serial::isValid() const {
+    return fd != -1;
 }
 
-bool Serial::try_disconnect(const std::string &sysname, sol::state *lua) {
-    return false;
-}
-
-void Serial::tick(sol::state &lua) {
-    unsigned char buf;
-    if (read(fd, &buf, 1) < 0) {
-        return;
-    }
-    auto func = lua["serial_in"];
-    if (func.valid()) {
-        func(lua_table, buf);
-    }
-}
 
 Serial::~Serial() {
     if(isValid()) {
@@ -36,7 +26,7 @@ Serial::~Serial() {
     }
 }
 
-Serial::Serial(const std::string &lua_name, sol::table &dev) : Input(lua_name, "Serial", dev) {
+Serial::Serial(sol::table &lua_table) {
     switch (lua_table.get_or("baudrate",115200)) {
         case 1200   :baudrate = B1200  ; break;
         case 2400   : baudrate = B2400  ; break;
@@ -48,8 +38,7 @@ Serial::Serial(const std::string &lua_name, sol::table &dev) : Input(lua_name, "
         case 115200 : baudrate = B115200; break;
         default     : throw DeviceException("Unknown baudrate");
     }
-    sysname = lua_table["device"];
-    lua_table["name"] = lua_name;
+    std::string sysname = lua_table["device"];
     fd = open(sysname.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0) {
         throw DeviceException("Unable to open serial port "+sysname);
@@ -71,5 +60,5 @@ Serial::Serial(const std::string &lua_name, sol::table &dev) : Input(lua_name, "
     ioctl(fd, TIOCGSERIAL, &ser_info);
     ser_info.flags |= ASYNC_LOW_LATENCY;
     ioctl(fd, TIOCSSERIAL, &ser_info);
-    std::cout << "Waiting for midi control signal from " << lua_name << std::endl;
+
 }

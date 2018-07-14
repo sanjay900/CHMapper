@@ -11,7 +11,9 @@
 #include <unistd.h>
 #include "output/buttons_ref.h"
 
-Controller::Controller(const std::string &lua_name, const std::string &name, sol::table &lua_table): Input(lua_name, name, lua_table) {}
+Controller::Controller(const std::string &lua_name, const std::string &name, sol::table &lua_table): Input(lua_name, name, lua_table) {
+    fd = -1;
+}
 
 void Controller::initMaps() {
     axisTypeBindings.clear();

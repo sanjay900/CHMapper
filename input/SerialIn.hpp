@@ -2,23 +2,22 @@
 // Created by sanjay on 14/07/18.
 //
 
-#ifndef SANPIE_SERIAL_H
-#define SANPIE_SERIAL_H
+#ifndef SANPIE_SERIALIN_H
+#define SANPIE_SERIALIN_H
 
 
 #include <termios.h>
 #include <sol.hpp>
+#include <Serial.hpp>
 #include "Input.hpp"
 
-class Serial: public virtual Input {
-    struct termios oldtio, newtio;
-    speed_t baudrate;
+class SerialIn: public virtual Input, public Serial {
     bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua) override;
     bool try_disconnect(const std::string &sysname,sol::state *lua) override;
     void tick(sol::state &lua) override;
 public:
-    Serial(const std::string &lua_name, sol::table &dev);
-    ~Serial();
+    bool isValid() const override;
+    SerialIn(const std::string &lua_name, sol::table &dev);
 };
 
 

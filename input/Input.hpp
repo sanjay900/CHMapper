@@ -15,7 +15,6 @@ protected:
     std::string lua_name;
     std::string name;
     std::string sysname;
-    int fd = -1;
 public:
     const sol::table &getLua_table() const;
 
@@ -28,7 +27,7 @@ public:
 
     const std::string &getName() const;
 
-    virtual bool isValid() const;
+    virtual bool isValid() const = 0;
 
     virtual void tick(sol::state &lua) = 0;
 

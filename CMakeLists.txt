@@ -17,9 +17,10 @@ set(LIB_SOURCE_FILES
         DeviceScanner.cpp
         output/OutputFactory.cpp
         input/MIDI.cpp
-        input/Serial.cpp
+        input/SerialIn.cpp
         input/Controller.cpp
-        )
+        Serial.cpp output/SerialOut.cpp output/SerialOut.h)
+
 add_library(libsanpie ${LIB_SOURCE_FILES})
 
 target_compile_features(libsanpie PUBLIC cxx_std_17)

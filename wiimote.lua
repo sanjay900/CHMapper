@@ -60,6 +60,11 @@ v_devices = {
         buttons = 9,
         axes = 2,
         guitar = true
+    },
+    serial = {
+        type = "serial",
+        device = "/dev/ttyACM0",
+        baudrate = 115200,
     }
 }
 count = 0

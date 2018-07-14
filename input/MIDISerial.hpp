@@ -8,11 +8,11 @@
 #include <fstream>
 #include "Input.hpp"
 #include "MIDI.hpp"
-#include "Serial.hpp"
+#include "SerialIn.hpp"
 
 #define MAX_MSG_SIZE 1024
 
-class MIDISerial: public MIDI, public Serial {
+class MIDISerial: public MIDI, public SerialIn {
 private:
     unsigned int i = 1;
     unsigned char buf[3];

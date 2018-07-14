@@ -16,7 +16,8 @@
 #include "output/buttons_ref.h"
 #include "Input.hpp"
 
-MIDISerial::MIDISerial(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDISerial", lua_table),Serial(lua_name, lua_table), MIDI(lua_name, lua_table) {
+MIDISerial::MIDISerial(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDISerial", lua_table),SerialIn(lua_name, lua_table), MIDI(lua_name, lua_table) {
+    std::cout << "Waiting for midi control signal from " << lua_name << std::endl;
 	do read(fd, buf, 1);
     while (buf[0] >> 7u == 0);
 }

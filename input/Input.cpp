@@ -45,11 +45,6 @@ bool operator>=(const Input &lhs, const Input &rhs) {
     return !(lhs < rhs);
 }
 
-
-bool Input::isValid() const {
-    return fd != -1;
-}
-
 Input *Input::create(std::string &name, sol::table &lua_table) {
     sol::optional<std::string> typeOpt = lua_table["type"];
     if (typeOpt == sol::nullopt) {
@@ -66,7 +61,7 @@ Input *Input::create(std::string &name, sol::table &lua_table) {
         return new MIDISerial(name, lua_table);
     }
     if (type == "serial") {
-        return new Serial(name, lua_table);
+        return new SerialIn(name, lua_table);
     }
     return new Controller(name, type, lua_table);
 }
