@@ -4,7 +4,6 @@
 
 #include <libudev.h>
 #include <input/Input.hpp>
-#include <input/InputFactory.hpp>
 #include <output/OutputFactory.hpp>
 #include "DeviceScanner.hpp"
 #include "DeviceException.hpp"
@@ -15,7 +14,7 @@ void DeviceScanner::scan_devices(sol::state &lua) {
         auto name = device.first.as<std::string>();
         sol::table lua_dev = device.second;
         lua_dev["name"] = name;
-        lua_dev["dev"] = InputFactory::create(name,lua_dev);
+        lua_dev["dev"] = Input::create(name,lua_dev);
     }
     for (auto &device : devices) {
         sol::table lua_dev = device.second;

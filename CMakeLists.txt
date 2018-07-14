@@ -15,7 +15,6 @@ set(LIB_SOURCE_FILES
         Loop.cpp
         Utils.cpp
         DeviceScanner.cpp
-        input/InputFactory.cpp
         output/OutputFactory.cpp
         input/MIDI.cpp
         input/Serial.cpp

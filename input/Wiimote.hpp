@@ -8,15 +8,14 @@
 
 #include "Controller.hpp"
 
-class Wiimote: Controller {
-    friend class InputFactory;
+class Wiimote: public Controller {
     std::string extension_name;
     Input* extension;
     Input* ir;
     Input* accelerometer;
     Input* motion_plus;
-    Wiimote(const std::string &name, sol::table &dev);
 public:
+    Wiimote(const std::string &name, sol::table &dev);
     bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua) override;
     bool try_disconnect(const std::string &sysname,sol::state *lua) override;
     void tick(sol::state &lua) override;

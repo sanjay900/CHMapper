@@ -10,12 +10,11 @@
 #include <rtmidi/RtMidi.h>
 
 class MIDI: public virtual Input {
-    friend class MIDIDirect;
-    friend class MIDISerial;
-    bool debug;
-    MIDI(const std::string &lua_name, sol::table &dev);
     static int padding;
     static std::map<unsigned char, std::string> func_map;
+protected:
+    bool debug;
+    MIDI(const std::string &lua_name, sol::table &dev);
 public:
     void parse_midi_command(unsigned char *buf, sol::state &lua);
 };

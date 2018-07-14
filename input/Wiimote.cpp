@@ -9,7 +9,6 @@
 #include <sol.hpp>
 #include "DeviceException.hpp"
 #include "Wiimote.hpp"
-#include "InputFactory.hpp"
 
 Wiimote::Wiimote(const std::string &name, sol::table &lua_table): Controller(name, "Nintendo Wii Remote", lua_table) {
     sol::optional<std::string> ext = lua_table["extension_type"];
@@ -42,8 +41,9 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
                     if (extension->try_to_use_device(udev, entry_dev,lua)) {
                         std::string name = extension->getName();
                         name = name.substr(std::string("Nintendo Wii Remote ").size());
-                        extension->lua_table["type"] = name;
-                        lua_table["extension"] = extension->lua_table;
+                        sol::table ext_table = extension->getLua_table();
+                        ext_table["type"] = name;
+                        lua_table["extension"] = extension->getLua_table();
                         lua_table["extension_name"] = name;
                     }
                 }
@@ -54,7 +54,7 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
         }
         std::string sysname = udev_device_get_sysname(udev_device);
 
-        return this->sysname == sysname || extension->sysname == sysname || ir->sysname == sysname || motion_plus->sysname == sysname || accelerometer->sysname == sysname;
+        return this->sysname == sysname || extension->getSysname() == sysname || ir->getSysname() == sysname || motion_plus->getSysname() == sysname || accelerometer->getSysname() == sysname;
     }
     sysname = udev_device_get_sysname(udev_device);
     const std::string devpath = "/dev/input/" + sysname;
@@ -87,10 +87,10 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
         std::string name = "Nintendo Wii Remote " + extension_name;
         ext_table["type"] = name;
     }
-    extension = InputFactory::create(lua_name,ext_table);
-    ir = InputFactory::create(lua_name,ir_table);
-    accelerometer = InputFactory::create(lua_name,accel_table);
-    motion_plus = InputFactory::create(lua_name,mp_table);
+    extension = Input::create(lua_name,ext_table);
+    ir = Input::create(lua_name,ir_table);
+    accelerometer = Input::create(lua_name,accel_table);
+    motion_plus = Input::create(lua_name,mp_table);
     bool found = false;
     udev_list_entry_foreach(entry, devices) {
         const char *path = udev_list_entry_get_name(entry);
@@ -133,10 +133,10 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
     udev_enumerate_unref(enumerate);
     if ((!extension_name.empty() && !extension->isValid()) || !found) {
         try_disconnect(sysname, nullptr);
-        extension->try_disconnect(extension->sysname, nullptr);
-        ir->try_disconnect(ir->sysname, nullptr);
-        accelerometer->try_disconnect(accelerometer->sysname, nullptr);
-        motion_plus->try_disconnect(motion_plus->sysname, nullptr);
+        extension->try_disconnect(extension->getSysname(), nullptr);
+        ir->try_disconnect(ir->getSysname(), nullptr);
+        accelerometer->try_disconnect(accelerometer->getSysname(), nullptr);
+        motion_plus->try_disconnect(motion_plus->getSysname(), nullptr);
         return false;
     }
     return true;
@@ -162,10 +162,10 @@ bool Wiimote::try_disconnect(const std::string &sysname,sol::state *lua) {
     if (!isValid())
         return false;
     if (extension->try_disconnect(sysname, lua)) {
-        ir->try_disconnect(ir->sysname, lua);
-        accelerometer->try_disconnect(accelerometer->sysname, lua);
-        motion_plus->try_disconnect(motion_plus->sysname, lua);
-        return Controller::try_disconnect(this->sysname, lua);
+        ir->try_disconnect(ir->getSysname(), lua);
+        accelerometer->try_disconnect(accelerometer->getSysname(), lua);
+        motion_plus->try_disconnect(motion_plus->getSysname(), lua);
+        return Controller::try_disconnect(this->getSysname(), lua);
     }
 
     return Controller::try_disconnect(sysname, lua);
