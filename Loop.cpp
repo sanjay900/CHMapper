@@ -9,7 +9,7 @@
 #include <thread>
 #include "Loop.hpp"
 #include "sol.hpp"
-#include "input/Controller.hpp"
+#include "input/Input.hpp"
 
 void Loop::tick() {
     long last = std::chrono::duration_cast<std::chrono::microseconds>(
@@ -27,20 +27,13 @@ void Loop::tick() {
 
     int fd = udev_monitor_get_fd(mon);
     sol::table devices = lua["devices"];
-    std::vector<Controller*> sorted_devices;
+    std::vector<Input*> sorted_devices;
     for (auto &device : devices) {
         sol::table lua_dev = device.second;
-        Controller &c = lua_dev["dev"];
+        Input &c = lua_dev["dev"];
         sorted_devices.push_back(&c);
     }
-
-    struct {
-        bool operator()(Controller* a, Controller* b) const
-        {
-            return a->getLua_name().compare(b->getLua_name()) < 0;
-        }
-    } sort;
-    std::sort(sorted_devices.begin(), sorted_devices.end(), sort);
+    std::sort(sorted_devices.begin(), sorted_devices.end());
     fd_set fds;
     struct timeval tm;
     tm.tv_sec = 0;
@@ -72,7 +65,7 @@ void Loop::tick() {
         for (auto &device : devices) {
             auto name = device.first.as<std::string>();
             sol::table lua_dev = device.second;
-            Controller& c = lua_dev["dev"];
+            Input& c = lua_dev["dev"];
             c.tick(lua);
         }
     }

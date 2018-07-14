@@ -3,11 +3,11 @@
 //
 
 #include <libudev.h>
-#include <input/Controller.hpp>
+#include <input/Input.hpp>
 #include <input/InputFactory.hpp>
 #include <output/OutputFactory.hpp>
 #include "DeviceScanner.hpp"
-#include "ControllerException.hpp"
+#include "DeviceException.hpp"
 
 void DeviceScanner::scan_devices(sol::state &lua) {
     sol::table devices = lua["devices"];
@@ -19,7 +19,7 @@ void DeviceScanner::scan_devices(sol::state &lua) {
     }
     for (auto &device : devices) {
         sol::table lua_dev = device.second;
-        Controller &c = lua_dev["dev"];
+        Input &c = lua_dev["dev"];
         this->devices.push_back(&c);
     }
     std::sort(this->devices.begin(), this->devices.end());
@@ -52,12 +52,12 @@ void DeviceScanner::scan_connected_devices(sol::state &lua)  {
     /* create udev object */
     udev = udev_new();
     if (!udev) {
-        throw ControllerException("Cannot create udev context.");
+        throw DeviceException("Cannot create udev context.");
     }
     /* create enumerate object */
     enumerate = udev_enumerate_new(udev);
     if (!enumerate) {
-        throw ControllerException("Cannot create enumerate context.");
+        throw DeviceException("Cannot create enumerate context.");
     }
 
     udev_enumerate_add_match_subsystem(enumerate, "input");
@@ -66,7 +66,7 @@ void DeviceScanner::scan_connected_devices(sol::state &lua)  {
     /* fillup device list */
     device_list = udev_enumerate_get_list_entry(enumerate);
     if (!device_list) {
-        throw ControllerException("Failed to get device list.");
+        throw DeviceException("Failed to get device list.");
     }
 
     udev_list_entry_foreach(dev_list_entry, device_list) {

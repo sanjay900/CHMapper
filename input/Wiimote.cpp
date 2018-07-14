@@ -6,11 +6,12 @@
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <fcntl.h>
 #include <zconf.h>
+#include <sol.hpp>
+#include "DeviceException.hpp"
 #include "Wiimote.hpp"
-#include "ControllerException.hpp"
-#include "input/InputFactory.hpp"
+#include "InputFactory.hpp"
 
-Wiimote::Wiimote(const std::string &name, sol::table &dev): Controller(name, "Nintendo Wii Remote", dev) {
+Wiimote::Wiimote(const std::string &name, sol::table &lua_table): Controller(name, "Nintendo Wii Remote", lua_table) {
     sol::optional<std::string> ext = lua_table["extension_type"];
     lua_table["type"] = "Remote";
     if (ext != sol::nullopt) {

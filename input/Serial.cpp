@@ -2,7 +2,7 @@
 // Created by sanjay on 14/07/18.
 //
 
-#include <ControllerException.hpp>
+#include <DeviceException.hpp>
 #include <fcntl.h>
 #include <linux/serial.h>
 #include <termio.h>
@@ -36,7 +36,7 @@ Serial::~Serial() {
     }
 }
 
-Serial::Serial(const std::string &lua_name, sol::table &dev) : Controller(lua_name, "Serial", dev) {
+Serial::Serial(const std::string &lua_name, sol::table &dev) : Input(lua_name, "Serial", dev) {
     switch (lua_table.get_or("baudrate",115200)) {
         case 1200   :baudrate = B1200  ; break;
         case 2400   : baudrate = B2400  ; break;
@@ -46,13 +46,13 @@ Serial::Serial(const std::string &lua_name, sol::table &dev) : Controller(lua_na
         case 38400  : baudrate = B38400 ; break;
         case 57600  : baudrate = B57600 ; break;
         case 115200 : baudrate = B115200; break;
-        default     : throw ControllerException("Unknown baudrate");
+        default     : throw DeviceException("Unknown baudrate");
     }
     sysname = lua_table["device"];
     lua_table["name"] = lua_name;
     fd = open(sysname.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0) {
-        throw ControllerException("Unable to open serial port "+sysname);
+        throw DeviceException("Unable to open serial port "+sysname);
     }
     struct serial_struct ser_info{};
     /* save current serial port settings */

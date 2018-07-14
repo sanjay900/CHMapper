@@ -6,13 +6,13 @@
 #define SANPIE_INPUTFACTORY_H
 
 
-#include <ControllerException.hpp>
-#include "Controller.hpp"
+#include <DeviceException.hpp>
+#include "Input.hpp"
 #include "Wiimote.hpp"
 
 class InputFactory {
 public:
-    static Controller* create(std::string &name, sol::table &lua_table);
+    static Input* create(std::string &name, sol::table &lua_table);
 };
 
 

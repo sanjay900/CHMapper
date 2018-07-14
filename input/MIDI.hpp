@@ -6,10 +6,10 @@
 #define WEJOY_MIDIBASE_H
 
 
-#include "Controller.hpp"
+#include "Input.hpp"
 #include <rtmidi/RtMidi.h>
 
-class MIDI: public virtual Controller {
+class MIDI: public virtual Input {
     friend class MIDIDirect;
     friend class MIDISerial;
     bool debug;

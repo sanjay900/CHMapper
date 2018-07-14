@@ -10,11 +10,11 @@
 #include <string>
 #include <utility>
 
-class ControllerException: public std::exception {
+class DeviceException: public std::exception {
 private:
     const std::string message_;
 public:
-    explicit ControllerException(std::string message);
+    explicit DeviceException(std::string message);
     virtual const char* what() const noexcept {
         return message_.c_str();
     }

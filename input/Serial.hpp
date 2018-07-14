@@ -8,9 +8,9 @@
 
 #include <termios.h>
 #include <sol.hpp>
-#include "Controller.hpp"
+#include "Input.hpp"
 
-class Serial: public virtual Controller {
+class Serial: public virtual Input {
     friend class MIDISerial;
     friend class InputFactory;
     Serial(const std::string &lua_name, sol::table &dev);
@@ -19,7 +19,7 @@ class Serial: public virtual Controller {
     bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua) override;
     bool try_disconnect(const std::string &sysname,sol::state *lua) override;
     void tick(sol::state &lua) override;
-    ~Serial() override;
+    ~Serial();
 };
 
 

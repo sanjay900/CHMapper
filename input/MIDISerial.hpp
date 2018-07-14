@@ -6,7 +6,7 @@
 #define WEJOY_MIDISER_H
 
 #include <fstream>
-#include "Controller.hpp"
+#include "Input.hpp"
 #include "MIDI.hpp"
 #include "Serial.hpp"
 

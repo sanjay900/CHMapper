@@ -6,7 +6,7 @@
 #define WEJOY_MIDID_H
 
 
-#include "Controller.hpp"
+#include "Input.hpp"
 #include "MIDI.hpp"
 #include <rtmidi/RtMidi.h>
 
@@ -25,7 +25,7 @@ private:
     bool isValid() const override;
 
 public:
-    ~MIDIDirect() override;
+    ~MIDIDirect();
 
 };
 

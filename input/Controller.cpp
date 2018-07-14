@@ -1,9 +1,9 @@
 //
 // Created by sanjay on 4/07/18.
 //
+#include "Input.hpp"
+#include "DeviceException.hpp"
 #include "Controller.hpp"
-#include "ControllerException.hpp"
-#include "Wiimote.hpp"
 #include <utility>
 #include <libudev.h>
 #include <libevdev-1.0/libevdev/libevdev.h>
@@ -11,21 +11,8 @@
 #include <unistd.h>
 #include "output/buttons_ref.h"
 
-Controller::Controller(const std::string &lua_name, const std::string &name, sol::table &lua_table) {
-    this->lua_table = lua_table;
-    this->lua_name = lua_name;
-    this->name = name;
-    lua_table["type"] = name;
-    lua_table["name"] = lua_name;
-}
+Controller::Controller(const std::string &lua_name, const std::string &name, sol::table &lua_table): Input(lua_name, name, lua_table) {}
 
-const std::string &Controller::getLua_name() const {
-    return lua_name;
-}
-
-const std::string &Controller::getName() const {
-    return name;
-}
 void Controller::initMaps() {
     axisTypeBindings.clear();
     axisBindings.clear();
@@ -135,24 +122,6 @@ void Controller::tick(sol::state& lua) {
 
 }
 
-
-
 int Controller::scale(int x, int in_min, int in_max, int out_min, int out_max) {
     return static_cast<int>(std::floor((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min));
-}
-
-bool operator<(const Controller &lhs, const Controller &rhs) {
-    return lhs.lua_name < rhs.lua_name;
-}
-
-bool operator>(const Controller &lhs, const Controller &rhs) {
-    return rhs < lhs;
-}
-
-bool operator<=(const Controller &lhs, const Controller &rhs) {
-    return !(rhs < lhs);
-}
-
-bool operator>=(const Controller &lhs, const Controller &rhs) {
-    return !(lhs < rhs);
 }

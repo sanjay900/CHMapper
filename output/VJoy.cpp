@@ -3,30 +3,30 @@
 #include <libevdev-1.0/libevdev/libevdev-uinput.h>
 #include "VJoy.hpp"
 #include "buttons_ref.h"
-#include "ControllerException.hpp"
+#include "DeviceException.hpp"
 
 VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_table), lua_name(lua_name) {
     sol::optional<uint> b = lua_table["buttons"];
     if (b == sol::nullopt) {
-        throw ControllerException("No button count was defined.");
+        throw DeviceException("No button count was defined.");
     }
     buttons = b.value();
     sol::optional<uint> a = lua_table["axes"];
     if (a == sol::nullopt) {
-        throw ControllerException("No axes count was defined.");
+        throw DeviceException("No axes count was defined.");
     }
     axes = a.value();
 
     //Setup buttons for device
     if (buttons >= BUTTONS_SIZE)
-        throw ControllerException(
+        throw DeviceException(
                 std::string("Number of buttons (") + std::to_string(axes) + ") for virtual device " + lua_name +
                 " exceeds maximum allowable buttonss which is " + std::to_string(BUTTONS_SIZE - 1) + ".");
 
     //Setup axesMapping for device
 
     if (axes >= AXES_SIZE)
-        throw ControllerException(
+        throw DeviceException(
                 std::string("Number of axes (") + std::to_string(axes) + ") for virtual device " + lua_name +
                 " exceeds maximum allowable axesMapping which is " + std::to_string(AXES_SIZE - 1) + ".");
     axesData.resize(axes, 0);
@@ -47,7 +47,7 @@ VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_t
                                                  LIBEVDEV_UINPUT_OPEN_MANAGED,
                                                  &uidev);
     if (err != 0) {
-        throw ControllerException(
+        throw DeviceException(
                 strerror(-err) + std::string(": Failed creating virtual device ") + lua_name + ".");
     }
 

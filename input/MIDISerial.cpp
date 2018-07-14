@@ -3,7 +3,7 @@
 //
 
 #include "MIDISerial.hpp"
-#include "ControllerException.hpp"
+#include "DeviceException.hpp"
 #include <utility>
 #include <fcntl.h>
 #include <unistd.h>
@@ -14,9 +14,9 @@
 #include <linux/ioctl.h>
 #include <asm/ioctls.h>
 #include "output/buttons_ref.h"
-#include "Controller.hpp"
+#include "Input.hpp"
 
-MIDISerial::MIDISerial(const std::string &lua_name, sol::table &lua_table): Controller(lua_name, "MIDISerial", lua_table),Serial(lua_name, lua_table), MIDI(lua_name, lua_table) {
+MIDISerial::MIDISerial(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDISerial", lua_table),Serial(lua_name, lua_table), MIDI(lua_name, lua_table) {
 	do read(fd, buf, 1);
     while (buf[0] >> 7u == 0);
 }

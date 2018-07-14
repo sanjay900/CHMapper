@@ -11,10 +11,10 @@
 class Wiimote: Controller {
     friend class InputFactory;
     std::string extension_name;
-    Controller* extension;
-    Controller* ir;
-    Controller* accelerometer;
-    Controller* motion_plus;
+    Input* extension;
+    Input* ir;
+    Input* accelerometer;
+    Input* motion_plus;
     Wiimote(const std::string &name, sol::table &dev);
 public:
     bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua) override;

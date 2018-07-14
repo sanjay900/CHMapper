@@ -3,7 +3,7 @@
 //
 
 #include "MIDIDirect.hpp"
-#include "ControllerException.hpp"
+#include "DeviceException.hpp"
 #include "Wiimote.hpp"
 #include <utility>
 #include <libudev.h>
@@ -13,7 +13,7 @@
 #include <csignal>
 #include "output/buttons_ref.h"
 
-MIDI::MIDI(const std::string &lua_name, sol::table &lua_table): Controller(lua_name, "MIDI", lua_table) {
+MIDI::MIDI(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDI", lua_table) {
     this->debug = lua_table.get_or("debug",false);
 }
 int MIDI::padding = 20;

@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 project(sanpie)
 set(LIB_SOURCE_FILES
         sol.hpp
-        input/Controller.cpp
+        input/Input.cpp
         input/Wiimote.cpp
-        ControllerException.cpp
+        DeviceException.cpp
         output/VJoy.cpp
         output/buttons_ref.h
         output/VKeyboard.cpp
@@ -18,7 +18,9 @@ set(LIB_SOURCE_FILES
         input/InputFactory.cpp
         output/OutputFactory.cpp
         input/MIDI.cpp
-        input/Serial.cpp input/Serial.hpp)
+        input/Serial.cpp
+        input/Controller.cpp
+        )
 add_library(libsanpie ${LIB_SOURCE_FILES})
 
 target_compile_features(libsanpie PUBLIC cxx_std_17)

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <libudev.h>
 #include "sol.hpp"
-#include "input/Controller.hpp"
-#include "ControllerException.hpp"
+#include "input/Input.hpp"
+#include "DeviceException.hpp"
 #include <chrono>
 #include <thread>
 #include <Loop.hpp>

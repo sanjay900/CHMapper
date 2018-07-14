@@ -6,10 +6,10 @@
 #include "MIDIDirect.hpp"
 #include "MIDISerial.hpp"
 
-Controller* InputFactory::create(std::string &name, sol::table &lua_table) {
+Input* InputFactory::create(std::string &name, sol::table &lua_table) {
     sol::optional<std::string> typeOpt = lua_table["type"];
     if (typeOpt == sol::nullopt) {
-        throw ControllerException("No type was defined.");
+        throw DeviceException("No type was defined.");
     }
     std::string type = typeOpt.value();
     if (type == "wii") {
