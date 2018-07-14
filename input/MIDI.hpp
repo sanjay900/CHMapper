@@ -9,11 +9,11 @@
 #include "Controller.hpp"
 #include <rtmidi/RtMidi.h>
 
-class MIDI: public Controller {
+class MIDI: public virtual Controller {
     friend class MIDIDirect;
     friend class MIDISerial;
     bool debug;
-    MIDI(const std::string &lua_name, const std::string &name, sol::table &dev);
+    MIDI(const std::string &lua_name, sol::table &dev);
     static int padding;
     static std::map<unsigned char, std::string> func_map;
 public:

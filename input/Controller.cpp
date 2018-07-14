@@ -1,8 +1,6 @@
 //
 // Created by sanjay on 4/07/18.
 //
-#include "MIDIDirect.hpp"
-#include "MIDISerial.hpp"
 #include "Controller.hpp"
 #include "ControllerException.hpp"
 #include "Wiimote.hpp"
@@ -11,7 +9,7 @@
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "buttons_ref.h"
+#include "output/buttons_ref.h"
 
 Controller::Controller(const std::string &lua_name, const std::string &name, sol::table &lua_table) {
     this->lua_table = lua_table;

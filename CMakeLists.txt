@@ -7,7 +7,7 @@ set(LIB_SOURCE_FILES
         input/Wiimote.cpp
         ControllerException.cpp
         output/VJoy.cpp
-        buttons_ref.h
+        output/buttons_ref.h
         output/VKeyboard.cpp
         input/MIDISerial.cpp
         input/MIDIDirect.cpp
@@ -18,7 +18,7 @@ set(LIB_SOURCE_FILES
         input/InputFactory.cpp
         output/OutputFactory.cpp
         input/MIDI.cpp
-        )
+        input/Serial.cpp input/Serial.hpp)
 add_library(libsanpie ${LIB_SOURCE_FILES})
 
 target_compile_features(libsanpie PUBLIC cxx_std_17)

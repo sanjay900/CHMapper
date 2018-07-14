@@ -15,17 +15,22 @@ devices = {
         type = "wii",
         extension_type = "Guitar",
     },
---    keys0 = {
---        type = "midi",
---        device = "Serial->MIDI:RtMidi Output 129:0",
---        debug = true
---    },
+    --    keys0 = {
+    --        type = "midi",
+    --        device = "Serial->MIDI:RtMidi Output 129:0",
+    --        debug = true
+    --    },
     keys0 = {
         type = "midi_serial",
         device = "/dev/ttyACM0",
         baudrate = 115200,
-        debug = false
-    }
+        debug = true
+    },
+--    serial0 = {
+--        type = "serial",
+--        device = "/dev/ttyACM0",
+--        baudrate = 115200,
+--    }
 }
 v_devices = {
     key = {
@@ -70,6 +75,9 @@ function tick(usec)
         end
         count = 0
     end
+end
+function serial_in(device, byte)
+    print(byte);
 end
 function midi_in_note_on(device, channel, key, velocity)
     if (key >= 41 and (key-41)/2 < 9) then

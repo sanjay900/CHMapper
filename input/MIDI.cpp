@@ -11,9 +11,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <csignal>
-#include "buttons_ref.h"
+#include "output/buttons_ref.h"
 
-MIDI::MIDI(const std::string &lua_name, const std::string &name, sol::table &lua_table): Controller(lua_name, name, lua_table) {}
+MIDI::MIDI(const std::string &lua_name, sol::table &lua_table): Controller(lua_name, "MIDI", lua_table) {
+    this->debug = lua_table.get_or("debug",false);
+}
 int MIDI::padding = 20;
 std::map<unsigned char, std::string> MIDI::func_map {
         {0x80, "note_off"},{0x90, "note_on"},{0xA0, "pressure_change"},

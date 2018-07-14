@@ -3,6 +3,8 @@
 //
 
 #include "InputFactory.hpp"
+#include "MIDIDirect.hpp"
+#include "MIDISerial.hpp"
 
 Controller* InputFactory::create(std::string &name, sol::table &lua_table) {
     sol::optional<std::string> typeOpt = lua_table["type"];
@@ -18,6 +20,9 @@ Controller* InputFactory::create(std::string &name, sol::table &lua_table) {
     }
     if (type == "midi_serial") {
         return new MIDISerial(name, lua_table);
+    }
+    if (type == "serial") {
+        return new Serial(name, lua_table);
     }
     return new Controller(name, type, lua_table);
 }

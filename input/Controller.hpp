@@ -14,6 +14,7 @@ class Controller {
     friend class Wiimote;
     friend class MIDIDirect;
     friend class MIDI;
+    friend class Serial;
     friend class MIDISerial;
     sol::table lua_table;
     std::string lua_name;

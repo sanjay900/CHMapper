@@ -9,8 +9,6 @@
 #include <ControllerException.hpp>
 #include "Controller.hpp"
 #include "Wiimote.hpp"
-#include "MIDIDirect.hpp"
-#include "MIDISerial.hpp"
 
 class InputFactory {
 public:
