@@ -6,7 +6,7 @@
 #define SANPIE_DEVICESCANNER_H
 
 
-#include <input/Input.hpp>
+#include <src/input/Input.hpp>
 #include "sol.hpp"
 
 class DeviceScanner {

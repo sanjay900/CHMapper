@@ -1,11 +1,11 @@
 #include <iostream>
 #include <libudev.h>
 #include "sol.hpp"
-#include "input/Input.hpp"
+#include "src/input/Input.hpp"
 #include "DeviceException.hpp"
 #include <chrono>
 #include <thread>
-#include <Loop.hpp>
+#include <src/Loop.hpp>
 #include <fcntl.h>
 #include <zconf.h>
 #include "Utils.hpp"

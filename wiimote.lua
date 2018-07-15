@@ -20,17 +20,17 @@ devices = {
     --        device = "Serial->MIDI:RtMidi Output 129:0",
     --        debug = true
     --    },
+    --    serial0 = {
+    --        type = "serial",
+    --        device = "/dev/ttyACM1",
+    --        baudrate = 115200,
+    --    }
     keys0 = {
         type = "midi_serial",
-        device = "/dev/ttyACM0",
+        device = "/dev/ttyACM2",
         baudrate = 115200,
-        debug = true
+        debug = false
     },
---    serial0 = {
---        type = "serial",
---        device = "/dev/ttyACM0",
---        baudrate = 115200,
---    }
 }
 v_devices = {
     key = {
@@ -65,7 +65,12 @@ v_devices = {
         type = "serial",
         device = "/dev/ttyACM0",
         baudrate = 115200,
-    }
+    },
+    --    serial = {
+    --        type = "serial",
+    --        device = "/dev/ttyACM2",
+    --        baudrate = 115200,
+    --    }
 }
 count = 0
 function tick(usec)
@@ -81,8 +86,18 @@ function tick(usec)
         count = 0
     end
 end
+last = -1;
 function serial_in(device, byte)
-    print(byte);
+    if last ~= -1 then
+        if byte==1 or byte == 0 then
+            if last == 2 then v_devices.vguitar0.send_button(0,byte==1) end
+            if last == 4 then v_devices.vguitar0.send_button(1,byte==1) end
+            if last == 5 then v_devices.vguitar0.send_button(2,byte==1) end
+            if last == 3 then v_devices.vguitar0.send_button(3,byte==1) end
+            v_devices.serial.write({last, byte});
+        end
+    end
+    last = byte;
 end
 function midi_in_note_on(device, channel, key, velocity)
     if (key >= 41 and (key-41)/2 < 9) then
@@ -137,6 +152,14 @@ function button_event(device, button, value)
     local name = device.name;
     local vDev = v_devices["v"..name];
     if string.starts(name,"guitar") then
+        if button == 2 then v_devices.serial.write({10, value}) end
+        if button == 3 then v_devices.serial.write({11, value}) end
+        if button == 4 then v_devices.serial.write({12, value}) end
+        if button == 5 then v_devices.serial.write({13, value}) end
+        if button == 6 then v_devices.serial.write({5, value}) end
+        if button == 7 then v_devices.serial.write({6, value}) end
+        if button == 8 then v_devices.serial.write({9, value}) end
+
         if button >= 2 then
             vDev.send_button(button - 2, value)
         else

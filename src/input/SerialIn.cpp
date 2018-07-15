@@ -2,7 +2,7 @@
 // Created by sanjay on 14/07/18.
 //
 
-#include <DeviceException.hpp>
+#include <src/DeviceException.hpp>
 #include <fcntl.h>
 #include <linux/serial.h>
 #include <termio.h>

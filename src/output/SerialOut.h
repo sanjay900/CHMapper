@@ -6,8 +6,8 @@
 #define SANPIE_SERIALOUT_H
 
 
-#include <sol.hpp>
-#include <Serial.hpp>
+#include <src/sol.hpp>
+#include <src/Serial.hpp>
 
 class SerialOut : Serial {
 public:

@@ -2,14 +2,13 @@
 // Created by sanjay on 4/07/18.
 //
 #include "Input.hpp"
-#include "DeviceException.hpp"
+#include "src/DeviceException.hpp"
 #include "Wiimote.hpp"
 #include <utility>
 #include <libudev.h>
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "output/buttons_ref.h"
 #include "MIDIDirect.hpp"
 #include "MIDISerial.hpp"
 

@@ -3,7 +3,7 @@
 
 
 #include <cstdint>
-#include "sol.hpp"
+#include "src/sol.hpp"
 
 class VMIDI {
     int fd;

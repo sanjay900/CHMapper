@@ -9,7 +9,11 @@ SerialOut::SerialOut(const std::string &lua_name, sol::table &lua_table): Serial
     lua_table["write"] = [&](sol::table table) {
         std::vector<unsigned char> data;
         for (auto &a: table) {
-            data.push_back(a.second.as<unsigned char>());
+            if (a.second.is<bool>()) {
+                data.push_back(a.second.as<bool>());
+            } else {
+                data.push_back(a.second.as<unsigned char>());
+            }
         }
         return write(fd, &data[0], data.size());
     };

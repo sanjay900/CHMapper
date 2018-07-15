@@ -3,7 +3,7 @@
 #include <libevdev-1.0/libevdev/libevdev-uinput.h>
 #include "VJoy.hpp"
 #include "buttons_ref.h"
-#include "DeviceException.hpp"
+#include "src/DeviceException.hpp"
 
 VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_table), lua_name(lua_name) {
     sol::optional<uint> b = lua_table["buttons"];

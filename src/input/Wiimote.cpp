@@ -6,8 +6,8 @@
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <fcntl.h>
 #include <zconf.h>
-#include <sol.hpp>
-#include "DeviceException.hpp"
+#include <src/sol.hpp>
+#include "src/DeviceException.hpp"
 #include "Wiimote.hpp"
 
 Wiimote::Wiimote(const std::string &name, sol::table &lua_table): Controller(name, "Nintendo Wii Remote", lua_table) {

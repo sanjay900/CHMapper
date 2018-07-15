@@ -3,7 +3,7 @@
 //
 
 #include "MIDIDirect.hpp"
-#include "DeviceException.hpp"
+#include "src/DeviceException.hpp"
 #include "Wiimote.hpp"
 #include <utility>
 #include <libudev.h>
@@ -11,7 +11,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <csignal>
-#include "output/buttons_ref.h"
 
 MIDIDirect::MIDIDirect(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDI", lua_table), MIDI(lua_name, lua_table) {
     lua_table["name"] = lua_name;

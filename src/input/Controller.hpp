@@ -7,7 +7,7 @@
 
 
 #include <map>
-#include "sol.hpp"
+#include "src/sol.hpp"
 #include "Input.hpp"
 
 class Controller : public Input {

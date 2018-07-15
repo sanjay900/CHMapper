@@ -3,8 +3,8 @@
 //
 
 #include <libudev.h>
-#include <input/Input.hpp>
-#include <output/OutputFactory.hpp>
+#include <src/input/Input.hpp>
+#include <src/output/OutputFactory.hpp>
 #include "DeviceScanner.hpp"
 #include "DeviceException.hpp"
 

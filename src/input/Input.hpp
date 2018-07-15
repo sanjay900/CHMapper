@@ -7,7 +7,7 @@
 
 
 #include <map>
-#include "sol.hpp"
+#include "src/sol.hpp"
 
 class Input {
 protected:

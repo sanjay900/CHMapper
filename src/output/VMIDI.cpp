@@ -5,8 +5,8 @@
 #include <zconf.h>
 #include "VMIDI.hpp"
 #include "buttons_ref.h"
-#include "DeviceException.hpp"
-#include "input/Input.hpp"
+#include "src/DeviceException.hpp"
+#include "src/input/Input.hpp"
 
 VMIDI::VMIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua) : lua_table(lua_table), lua_name(lua_name) {
 

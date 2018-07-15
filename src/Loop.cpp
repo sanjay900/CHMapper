@@ -9,7 +9,7 @@
 #include <thread>
 #include "Loop.hpp"
 #include "sol.hpp"
-#include "input/Input.hpp"
+#include "src/input/Input.hpp"
 
 void Loop::tick() {
     long last = std::chrono::duration_cast<std::chrono::microseconds>(

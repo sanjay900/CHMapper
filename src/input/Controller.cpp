@@ -2,14 +2,14 @@
 // Created by sanjay on 4/07/18.
 //
 #include "Input.hpp"
-#include "DeviceException.hpp"
+#include "src/DeviceException.hpp"
 #include "Controller.hpp"
 #include <utility>
 #include <libudev.h>
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "output/buttons_ref.h"
+#include "src/output/buttons_ref.h"
 
 Controller::Controller(const std::string &lua_name, const std::string &name, sol::table &lua_table): Input(lua_name, name, lua_table) {
     fd = -1;

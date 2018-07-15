@@ -7,8 +7,8 @@
 
 
 #include <termios.h>
-#include <sol.hpp>
-#include <Serial.hpp>
+#include <src/sol.hpp>
+#include <src/Serial.hpp>
 #include "Input.hpp"
 
 class SerialIn: public virtual Input, public Serial {

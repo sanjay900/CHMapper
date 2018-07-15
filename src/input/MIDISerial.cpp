@@ -3,7 +3,7 @@
 //
 
 #include "MIDISerial.hpp"
-#include "DeviceException.hpp"
+#include "src/DeviceException.hpp"
 #include <utility>
 #include <fcntl.h>
 #include <unistd.h>
@@ -13,7 +13,6 @@
 #include <linux/serial.h>
 #include <linux/ioctl.h>
 #include <asm/ioctls.h>
-#include "output/buttons_ref.h"
 #include "Input.hpp"
 
 MIDISerial::MIDISerial(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDISerial", lua_table),SerialIn(lua_name, lua_table), MIDI(lua_name, lua_table) {

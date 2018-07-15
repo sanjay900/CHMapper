@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include <sol.hpp>
+#include <src/sol.hpp>
 
 class OutputFactory {
 public:
