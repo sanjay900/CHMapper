@@ -8,24 +8,26 @@
 #include "DeviceScanner.hpp"
 #include "DeviceException.hpp"
 
-void DeviceScanner::scan_devices(sol::state &lua) {
-    sol::table devices = lua["devices"];
-    for (auto &device : devices) {
-        auto name = device.first.as<std::string>();
-        sol::table lua_dev = device.second;
-        lua_dev["name"] = name;
-        lua_dev["dev"] = Input::create(name,lua_dev);
-    }
-    for (auto &device : devices) {
-        sol::table lua_dev = device.second;
-        Input &c = lua_dev["dev"];
-        this->devices.push_back(&c);
-    }
-    std::sort(this->devices.begin(), this->devices.end());
-}
 bool compareDev(const std::pair<std::string, sol::table>& a, const std::pair<std::string, sol::table>& b) {
     return a.first < b.first;
 
+}
+void DeviceScanner::scan_devices(sol::state &lua) {
+    sol::table devices = lua["devices"];
+    std::vector<std::pair<std::string,sol::table>> devices_sorted;
+    for (auto &device : devices) {
+        auto name = device.first.as<std::string>();
+        devices_sorted.emplace_back(name, device.second);
+    }
+    std::sort(devices_sorted.begin(), devices_sorted.end(), compareDev);
+    for (auto &device : devices_sorted) {
+        auto name = device.first;
+        sol::table lua_dev = device.second;
+        Input *c = Input::create(name,lua_dev);
+        lua_dev["dev"] = c;
+        lua_dev["name"] = name;
+        this->devices.push_back(c);
+    }
 }
 void DeviceScanner::scan_v_devices(sol::state &lua) {
     sol::table v_devices = lua["v_devices"];

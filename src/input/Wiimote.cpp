@@ -67,6 +67,7 @@ bool Wiimote::try_to_use_device(struct udev * udev, struct udev_device * udev_de
     }
     const std::string found_name = libevdev_get_name(_dev);
     libevdev_free(_dev);
+    close(fd);
     if (found_name.find("Nintendo Wii") == std::string::npos) {
         return false;
     }

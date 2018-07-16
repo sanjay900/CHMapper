@@ -66,11 +66,11 @@ v_devices = {
         device = "/dev/ttyACM0",
         baudrate = 115200,
     },
-    --    serial = {
-    --        type = "serial",
-    --        device = "/dev/ttyACM2",
-    --        baudrate = 115200,
-    --    }
+    serial1 = {
+        type = "serial",
+        device = "/dev/ttyACM1",
+        baudrate = 115200,
+    }
 }
 count = 0
 function tick(usec)
@@ -100,6 +100,14 @@ function serial_in(device, byte)
     last = byte;
 end
 function midi_in_note_on(device, channel, key, velocity)
+    local key2 = math.ceil(((key-41)/2));
+    if key2 == 0 then v_devices.serial1.write({10, velocity>0}) end
+    if key2 == 1 then v_devices.serial1.write({11, velocity>0}) end
+    if key2 == 2 then v_devices.serial1.write({12, velocity>0}) end
+    if key2 == 3 then v_devices.serial1.write({13, velocity>0}) end
+    if key2 == 4 then v_devices.serial1.write({5, velocity>0}) end
+    if key2 == 5 then v_devices.serial1.write({6, velocity>0}) end
+    if key2 == 6 then v_devices.serial1.write({9, velocity>0}) end
     if (key >= 41 and (key-41)/2 < 9) then
         v_devices.vguitar1.send_button((key-41)/2,velocity ~= 0)
     end
