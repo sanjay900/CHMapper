@@ -62,8 +62,6 @@ bool Serial::try_disconnect(const std::string &sysname, sol::state *lua) {
     if (this->sysname != std::string("/dev/")+sysname) {
         return false;
     }
-    std::cout << sysname << "-" << std::endl;
-    std::cout << std::string("/dev/")+sysname << "-" << std::endl;
     tcsetattr(fd, TCSANOW, &oldtio);
     close(fd);
     fd = -1;

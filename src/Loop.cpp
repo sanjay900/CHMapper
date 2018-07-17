@@ -30,17 +30,18 @@ void Loop::tick() {
     int fd = udev_monitor_get_fd(mon);
     sol::table devices = lua["devices"];
     sol::table out_devices = lua["v_devices"];
-    std::vector<Input*> sorted_devices;
-    std::vector<Output*> sorted_out_devices;
+    std::vector<Input*> sorted_inputs;
+    std::vector<Device*> sorted_devices;
     for (auto &device : devices) {
         sol::table lua_dev = device.second;
         Input &c = lua_dev["dev"];
         sorted_devices.push_back(&c);
+        sorted_inputs.push_back(&c);
     }
-    for (auto &device : devices) {
+    for (auto &device : out_devices) {
         sol::table lua_dev = device.second;
         Output &c = lua_dev["dev"];
-        sorted_out_devices.push_back(&c);
+        sorted_devices.push_back(&c);
     }
     std::sort(sorted_devices.begin(), sorted_devices.end());
     fd_set fds;
@@ -71,11 +72,8 @@ void Loop::tick() {
         ).count();
         lua["tick"](current-last);
         last = current;
-        for (auto &device : devices) {
-            auto name = device.first.as<std::string>();
-            sol::table lua_dev = device.second;
-            Input& c = lua_dev["dev"];
-            c.tick(lua);
+        for (auto &device : sorted_inputs) {
+            device->tick(lua);
         }
     }
 }

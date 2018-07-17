@@ -27,3 +27,5 @@ Output* Output::create(std::string &name, sol::table &lua_dev, sol::state &lua) 
     lua_dev["dev"] = out;
     return out;
 }
+
+
