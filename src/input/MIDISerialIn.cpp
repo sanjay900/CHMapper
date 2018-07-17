@@ -2,7 +2,7 @@
 // Created by sanjay on 4/07/18.
 //
 
-#include "MIDISerial.hpp"
+#include "MIDISerialIn.hpp"
 #include "src/DeviceException.hpp"
 #include <utility>
 #include <fcntl.h>
@@ -15,19 +15,19 @@
 #include <asm/ioctls.h>
 #include "Input.hpp"
 
-MIDISerial::MIDISerial(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDISerial", lua_table),SerialIn(lua_name, lua_table), MIDI(lua_name, lua_table) {
+MIDISerialIn::MIDISerialIn(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDISerialIn", lua_table),SerialIn(lua_name, lua_table), CoreMIDIIn(lua_name, lua_table) {
     std::cout << "Waiting for midi control signal from " << lua_name << std::endl;
 	do read(fd, buf, 1);
     while (buf[0] >> 7u == 0);
 }
 
-bool MIDISerial::try_to_use_device(struct udev * udev, struct udev_device * device, sol::state &lua) {
+bool MIDISerialIn::try_to_use_device(struct udev * udev, struct udev_device * device, sol::state &lua) {
     return false;
 }
-bool MIDISerial::try_disconnect(const std::string &sysname,sol::state *lua) {
+bool MIDISerialIn::try_disconnect(const std::string &sysname,sol::state *lua) {
     return false;
 }
-void MIDISerial::tick(sol::state& lua) {
+void MIDISerialIn::tick(sol::state& lua) {
     if (!isValid()) return;
 
     while (i < 3) {
@@ -79,4 +79,8 @@ void MIDISerial::tick(sol::state& lua) {
 
         /* parse MIDI message */
     else parse_midi_command(buf, lua);
+}
+
+void MIDISerialIn::send_message(unsigned char *buf) {
+
 }

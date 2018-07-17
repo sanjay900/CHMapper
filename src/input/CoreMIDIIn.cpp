@@ -2,7 +2,7 @@
 // Created by sanjay on 4/07/18.
 //
 
-#include "MIDIDirect.hpp"
+#include "MIDIIn.hpp"
 #include "src/DeviceException.hpp"
 #include "Wiimote.hpp"
 #include <utility>
@@ -12,17 +12,18 @@
 #include <unistd.h>
 #include <csignal>
 
-MIDI::MIDI(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDI", lua_table) {
+CoreMIDIIn::CoreMIDIIn(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDI", lua_table) {
     this->debug = lua_table.get_or("debug",false);
 }
-int MIDI::padding = 20;
-std::map<unsigned char, std::string> MIDI::func_map {
+int CoreMIDIIn::padding = 20;
+std::map<unsigned char, std::string> CoreMIDIIn::func_map {
         {0x80, "note_off"},{0x90, "note_on"},{0xA0, "pressure_change"},
         {0xB0, "controller_change"},{0xC0, "program_change"},
         {0xD0, "channel_change"},{0xE0, "pitch_bend"},
         {0xF0, "sys_ex"}
 };
-void MIDI::parse_midi_command(unsigned char *buf, sol::state& lua)
+//TODO: write functions that generate a message for each function above, and then support MIDI out for the hell of it
+void CoreMIDIIn::parse_midi_command(unsigned char *buf, sol::state& lua)
 {
     unsigned char operation, channel, param1, param2;
 

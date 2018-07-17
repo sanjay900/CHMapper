@@ -9,13 +9,13 @@ set(LIB_SOURCE_FILES
         src/output/VJoy.cpp
         src/output/buttons_ref.h
         src/output/VKeyboard.cpp
-        src/input/MIDISerial.cpp
-        src/input/MIDIDirect.cpp
+        src/input/MIDISerialIn.cpp
+        src/input/MIDIIn.cpp
         src/output/VMIDI.cpp
         src/Loop.cpp
         src/Utils.cpp
         src/DeviceScanner.cpp
-        src/input/MIDI.cpp
+        src/input/CoreMIDIIn.cpp
         src/input/SerialIn.cpp
         src/input/Controller.cpp
         src/Serial.cpp
