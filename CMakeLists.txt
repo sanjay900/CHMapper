@@ -15,13 +15,12 @@ set(LIB_SOURCE_FILES
         src/Loop.cpp
         src/Utils.cpp
         src/DeviceScanner.cpp
-        src/output/OutputFactory.cpp
         src/input/MIDI.cpp
         src/input/SerialIn.cpp
         src/input/Controller.cpp
         src/Serial.cpp
         src/output/SerialOut.cpp
-        src/output/SerialOut.h)
+        src/output/SerialOut.h src/output/Output.cpp src/output/Output.hpp src/Device.cpp src/Device.hpp)
 
 add_library(libsanpie ${LIB_SOURCE_FILES})
 

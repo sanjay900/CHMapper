@@ -42,3 +42,14 @@ void VKeyboard::send_key(uint type, bool value) {
     libevdev_uinput_write_event(uidev, EV_KEY, type, value);
     libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
 }
+
+
+
+bool VKeyboard::try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) {
+    return false;
+}
+
+bool VKeyboard::try_disconnect(const std::string &sysname, sol::state *lua) {
+    return false;
+}
+

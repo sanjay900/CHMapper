@@ -12,8 +12,6 @@
 #include "Input.hpp"
 
 class SerialIn: public virtual Input, public Serial {
-    bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua) override;
-    bool try_disconnect(const std::string &sysname,sol::state *lua) override;
     void tick(sol::state &lua) override;
 public:
     bool isValid() const override;

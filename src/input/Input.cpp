@@ -28,23 +28,8 @@ const std::string &Input::getName() const {
     return name;
 }
 
-bool operator<(const Input &lhs, const Input &rhs) {
-    return lhs.lua_name < rhs.lua_name;
-}
-
-bool operator>(const Input &lhs, const Input &rhs) {
-    return rhs < lhs;
-}
-
-bool operator<=(const Input &lhs, const Input &rhs) {
-    return !(rhs < lhs);
-}
-
-bool operator>=(const Input &lhs, const Input &rhs) {
-    return !(lhs < rhs);
-}
-
 Input *Input::create(std::string &name, sol::table &lua_table) {
+    lua_table["name"] = name;
     sol::optional<std::string> typeOpt = lua_table["type"];
     if (typeOpt == sol::nullopt) {
         throw DeviceException("No type was defined.");

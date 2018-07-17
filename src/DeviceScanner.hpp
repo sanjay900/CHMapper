@@ -7,10 +7,11 @@
 
 
 #include <src/input/Input.hpp>
+#include <src/output/Output.hpp>
 #include "sol.hpp"
 
 class DeviceScanner {
-    std::vector<Input*> devices;
+    std::vector<Device*> devices;
     void scan_devices(sol::state &lua);
     void scan_v_devices(sol::state &lua);
     void scan_connected_devices(sol::state &lua);

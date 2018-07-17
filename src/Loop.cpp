@@ -7,6 +7,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <src/output/Output.hpp>
 #include "Loop.hpp"
 #include "sol.hpp"
 #include "src/input/Input.hpp"
@@ -23,15 +24,23 @@ void Loop::tick() {
     struct udev_monitor* mon = udev_monitor_new_from_netlink(udev, "udev");
 
     udev_monitor_filter_add_match_subsystem_devtype(mon, "input", NULL);
+    udev_monitor_filter_add_match_subsystem_devtype(mon, "tty", NULL);
     udev_monitor_enable_receiving(mon);
 
     int fd = udev_monitor_get_fd(mon);
     sol::table devices = lua["devices"];
+    sol::table out_devices = lua["v_devices"];
     std::vector<Input*> sorted_devices;
+    std::vector<Output*> sorted_out_devices;
     for (auto &device : devices) {
         sol::table lua_dev = device.second;
         Input &c = lua_dev["dev"];
         sorted_devices.push_back(&c);
+    }
+    for (auto &device : devices) {
+        sol::table lua_dev = device.second;
+        Output &c = lua_dev["dev"];
+        sorted_out_devices.push_back(&c);
     }
     std::sort(sorted_devices.begin(), sorted_devices.end());
     fd_set fds;

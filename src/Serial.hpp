@@ -8,15 +8,21 @@
 
 #include <termios.h>
 #include "sol.hpp"
+#include "Device.hpp"
 
-class Serial {
+class Serial : virtual public Device {
     struct termios oldtio, newtio;
     speed_t baudrate;
+    std::string sysname;
 
 protected:
     bool isValid() const;
     int fd = -1;
 public:
+    bool try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) override;
+
+    bool try_disconnect(const std::string &sysname, sol::state *lua) override;
+
     Serial(sol::table &dev);
     ~Serial();
 };

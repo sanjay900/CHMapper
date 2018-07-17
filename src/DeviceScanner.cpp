@@ -4,7 +4,7 @@
 
 #include <libudev.h>
 #include <src/input/Input.hpp>
-#include <src/output/OutputFactory.hpp>
+#include <src/output/Output.hpp>
 #include "DeviceScanner.hpp"
 #include "DeviceException.hpp"
 
@@ -25,7 +25,6 @@ void DeviceScanner::scan_devices(sol::state &lua) {
         sol::table lua_dev = device.second;
         Input *c = Input::create(name,lua_dev);
         lua_dev["dev"] = c;
-        lua_dev["name"] = name;
         this->devices.push_back(c);
     }
 }
@@ -40,7 +39,7 @@ void DeviceScanner::scan_v_devices(sol::state &lua) {
     for (auto &device: v_devices_sorted) {
         auto name = device.first;
         sol::table lua_dev = device.second;
-        OutputFactory::create(name, lua_dev, lua);
+        this->devices.push_back(Output::create(name, lua_dev, lua));
     }
 }
 
@@ -62,6 +61,7 @@ void DeviceScanner::scan_connected_devices(sol::state &lua)  {
     }
 
     udev_enumerate_add_match_subsystem(enumerate, "input");
+    udev_enumerate_add_match_subsystem(enumerate, "tty");
     udev_enumerate_scan_devices(enumerate);
 
     /* fillup device list */
@@ -75,11 +75,9 @@ void DeviceScanner::scan_connected_devices(sol::state &lua)  {
         dev = udev_device_new_from_syspath(udev, path);
         if (dev == nullptr) continue;
         std::string dev_name = udev_device_get_sysname(dev);
-        if (dev_name.find("event") != std::string::npos) {
-            for (auto &c : devices) {
-                if (c->try_to_use_device(udev, dev,lua)) {
-                    break;
-                }
+        for (auto &c : devices) {
+            if (c->try_to_use_device(udev, dev,lua)) {
+                break;
             }
         }
         udev_device_unref(dev);

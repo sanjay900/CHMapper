@@ -20,17 +20,17 @@ devices = {
     --        device = "Serial->MIDI:RtMidi Output 129:0",
     --        debug = true
     --    },
-    --    serial0 = {
-    --        type = "serial",
-    --        device = "/dev/ttyACM1",
-    --        baudrate = 115200,
-    --    }
-    keys0 = {
-        type = "midi_serial",
-        device = "/dev/ttyACM2",
-        baudrate = 115200,
-        debug = false
-    },
+        serial0 = {
+            type = "serial",
+            device = "/dev/ttyACM1",
+            baudrate = 115200,
+        }
+--    keys0 = {
+--        type = "midi_serial",
+--        device = "/dev/ttyACM2",
+--        baudrate = 115200,
+--        debug = false
+--    },
 }
 v_devices = {
     key = {
@@ -38,7 +38,7 @@ v_devices = {
     },
     midi = {
         type="midi",
-        device = "/dev/midi3"
+        device = "/dev/midi"
     },
     vguitar0 = {
         buttons = 9,

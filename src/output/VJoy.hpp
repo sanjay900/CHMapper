@@ -4,14 +4,20 @@
 
 #include <cstdint>
 #include "src/sol.hpp"
+#include "Output.hpp"
 
-class VJoy {
+class VJoy : public Output {
     struct libevdev_uinput *uidev;
     uint axes;
     uint buttons;
     uint64_t buttonFlags = 0;
     std::vector<int> axesData;
     sol::table lua_table;
+
+    bool try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) override;
+
+    bool try_disconnect(const std::string &sysname, sol::state *lua) override;
+
     std::string lua_name;
     void send_button_event(uint, bool);
 

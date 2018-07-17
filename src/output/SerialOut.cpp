@@ -18,3 +18,11 @@ SerialOut::SerialOut(const std::string &lua_name, sol::table &lua_table): Serial
         return write(fd, &data[0], data.size());
     };
 }
+
+bool SerialOut::try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) {
+    return Serial::try_to_use_device(udev, device, lua);
+}
+
+bool SerialOut::try_disconnect(const std::string &sysname, sol::state *lua) {
+    return Serial::try_disconnect(sysname, lua);
+}

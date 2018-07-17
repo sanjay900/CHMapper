@@ -40,3 +40,11 @@ VMIDI::VMIDI(const std::string &lua_name, sol::table &lua_table, sol::state& lua
 VMIDI::~VMIDI() {
     close(fd);
 }
+
+bool VMIDI::try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) {
+    return false;
+}
+
+bool VMIDI::try_disconnect(const std::string &sysname, sol::state *lua) {
+    return false;
+}

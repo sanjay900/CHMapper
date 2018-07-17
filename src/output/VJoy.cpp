@@ -82,3 +82,11 @@ void VJoy::send_axis_event(uint type, int value) {
     libevdev_uinput_write_event(uidev, EV_ABS, buttons_ref::AXES[type], value);
     libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
 }
+
+bool VJoy::try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) {
+    return false;
+}
+
+bool VJoy::try_disconnect(const std::string &sysname, sol::state *lua) {
+    return false;
+}
