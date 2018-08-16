@@ -19,11 +19,9 @@ private:
     char msg[MAX_MSG_SIZE];
 public:
     MIDISerialIn(const std::string &name, sol::table &dev);
-    bool try_to_use_device(struct udev*, struct udev_device*, sol::state &lua) override;
-    bool try_disconnect(const std::string &sysname,sol::state *lua) override;
     void tick(sol::state &lua) override;
 
-    void send_message(unsigned char *buf) override;
+    bool try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) override;
 };
 
 

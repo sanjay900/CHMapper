@@ -54,6 +54,7 @@ bool Serial::try_to_use_device(struct udev *, struct udev_device * device, sol::
     ioctl(fd, TIOCGSERIAL, &ser_info);
     ser_info.flags |= ASYNC_LOW_LATENCY;
     ioctl(fd, TIOCSSERIAL, &ser_info);
+
     //Don't claim a serial device, as they can be used for both input and output.
     return false;
 }
@@ -79,6 +80,8 @@ Serial::Serial(sol::table &lua_table) {
         case 38400  : baudrate = B38400 ; break;
         case 57600  : baudrate = B57600 ; break;
         case 115200 : baudrate = B115200; break;
+        case 500000 : baudrate = B500000; break;
+        case 1000000: baudrate = B1000000; break;
         default     : throw DeviceException("Unknown baudrate for device: "+sysname);
     }
 }

@@ -7,39 +7,44 @@ devices = {
         type = "wii",
         extension_type = "Guitar",
     },
-    guitar1 = {
-        type = "wii",
-        extension_type = "Guitar",
-    },
-    guitar2 = {
-        type = "wii",
-        extension_type = "Guitar",
-    },
+--    guitar1 = {
+--        type = "wii",
+--        extension_type = "Guitar",
+--    },
+--    guitar2 = {
+--        type = "wii",
+--        extension_type = "Guitar",
+--    },
     --    keys0 = {
     --        type = "midi",
     --        device = "Serial->MIDI:RtMidi Output 129:0",
     --        debug = true
     --    },
-        serial0 = {
-            type = "serial",
-            device = "/dev/ttyACM1",
-            baudrate = 115200,
-        }
---    keys0 = {
---        type = "midi_serial",
---        device = "/dev/ttyACM2",
---        baudrate = 115200,
---        debug = false
---    },
+    serial0 = {
+        type = "serial",
+        device = "/dev/ttyACM0",
+        baudrate = 1000000,
+    },
+    --    keys0 = {
+    --        type = "midi_serial",
+    --        device = "/dev/ttyACM2",
+    --        baudrate = 115200,
+    --        debug = false
+    --    },
+    --    nxt = {
+    --        type = "serial",
+    --        device = "/dev/rfcomm0",
+    --        baudrate = 38400,
+    --    }
 }
 v_devices = {
-    key = {
-        type="keyboard",
-    },
-    midi = {
-        type="midi",
-        device = "/dev/midi"
-    },
+    --    key = {
+    --        type="keyboard",
+    --    },
+    --    midi = {
+    --        type="midi",
+    --        device = "/dev/midi3"
+    --    },
     vguitar0 = {
         buttons = 9,
         axes = 6
@@ -61,16 +66,21 @@ v_devices = {
         axes = 2,
         guitar = true
     },
-    serial = {
-        type = "serial",
-        device = "/dev/ttyACM0",
-        baudrate = 115200,
-    },
-    serial1 = {
-        type = "serial",
-        device = "/dev/ttyACM1",
-        baudrate = 115200,
-    }
+    --    serial = {
+    --        type = "serial",
+    --        device = "/dev/ttyACM0",
+    --        baudrate = 115200,
+    --    },
+    --    serial1 = {
+    --        type = "serial",
+    --        device = "/dev/ttyACM1",
+    --        baudrate = 115200,
+    --    },
+    --    nxt = {
+    --        type = "serial",
+    --        device = "/dev/rfcomm0",
+    --        baudrate = 57600,
+    --    }
 }
 count = 0
 function tick(usec)
@@ -84,22 +94,35 @@ function tick(usec)
             end
         end
         count = 0
+        --        v_devices.nxt.write({0x03, 0x00, 0x00, 0x06,0x01})
     end
 end
-last = -1;
+current = -1;
 function serial_in(device, byte)
-    if last ~= -1 then
-        if byte==1 or byte == 0 then
-            if last == 2 then v_devices.vguitar0.send_button(0,byte==1) end
-            if last == 4 then v_devices.vguitar0.send_button(1,byte==1) end
-            if last == 5 then v_devices.vguitar0.send_button(2,byte==1) end
-            if last == 3 then v_devices.vguitar0.send_button(3,byte==1) end
-            v_devices.serial.write({last, byte});
-        end
+    if byte == 128 then
+        current = 0;
     end
-    last = byte;
+    if current >= 0 then
+        if current < 10 and current > 0 then v_devices.vguitar0.send_button(current-1,byte==1) end
+        if current == 10 then v_devices.vguitar0.send_axis(0, (byte-32)*1024) end
+        if current == 11 then v_devices.vguitar0.send_axis(1, (byte-32)*1024) end
+        if current == 12 then v_devices.vguitar0.send_axis(2, (byte-15)*2048) end
+        if current == 13 then
+            if byte == 1 then
+                v_devices.vguitar0.send_axis(3, 32767);
+            else
+                v_devices.vguitar0.send_axis(3, 0);
+            end
+        end
+        current= current+1;
+    end
 end
 function midi_in_note_on(device, channel, key, velocity)
+    --    if velocity ~= 0 then
+    --        local hz = math.floor(math.pow(2,(key-69) / 12) * (440))
+    --        local duration = 100
+    --        v_devices.nxt.write({6, 0, 0, 3, hz&0xff, hz >> 8, duration&0xff, duration >> 8})
+    --    end
     local key2 = math.ceil(((key-41)/2));
     if key2 == 0 then v_devices.serial1.write({10, velocity>0}) end
     if key2 == 1 then v_devices.serial1.write({11, velocity>0}) end
@@ -138,7 +161,11 @@ function axis_event(device, axis, value)
         if device.type == "Drums" then
             local vel = math.scale(value,-32767,0, 0, 127)
             vel = math.min(127,vel)
-            v_devices.midi.note(1,50+axis,vel)
+            --            v_devices.midi.note(1,50+axis,vel)
+            if axis == 7 then
+                v_devices.vguitar0.send_button(8,value > 0)
+            end
+
         end
         if vDev.guitar then
             if axis < 2 then
@@ -160,14 +187,6 @@ function button_event(device, button, value)
     local name = device.name;
     local vDev = v_devices["v"..name];
     if string.starts(name,"guitar") then
-        if button == 2 then v_devices.serial.write({10, value}) end
-        if button == 3 then v_devices.serial.write({11, value}) end
-        if button == 4 then v_devices.serial.write({12, value}) end
-        if button == 5 then v_devices.serial.write({13, value}) end
-        if button == 6 then v_devices.serial.write({5, value}) end
-        if button == 7 then v_devices.serial.write({6, value}) end
-        if button == 8 then v_devices.serial.write({9, value}) end
-
         if button >= 2 then
             vDev.send_button(button - 2, value)
         else

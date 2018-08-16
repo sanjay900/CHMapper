@@ -7,8 +7,9 @@
 #include <linux/serial.h>
 #include <termio.h>
 #include <zconf.h>
+#include <chrono>
 #include "SerialIn.hpp"
-
+auto begin = std::chrono::high_resolution_clock::now();
 void SerialIn::tick(sol::state &lua) {
     unsigned char buf;
     if (read(fd, &buf, 1) < 0) {

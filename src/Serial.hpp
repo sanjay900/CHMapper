@@ -13,11 +13,11 @@
 class Serial : virtual public Device {
     struct termios oldtio, newtio;
     speed_t baudrate;
-    std::string sysname;
 
 protected:
     bool isValid() const;
     int fd = -1;
+    std::string sysname;
 public:
     bool try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) override;
 

@@ -19,8 +19,6 @@ public:
     bool try_disconnect(const std::string &sysname,sol::state *lua) override;
     void tick(sol::state &lua) override;
 
-    void send_message(unsigned char *buf) override;
-
 private:
     bool isValid() const override;
 

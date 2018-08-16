@@ -13,20 +13,24 @@
 #include <linux/serial.h>
 #include <linux/ioctl.h>
 #include <asm/ioctls.h>
+#include <libudev.h>
 #include "Input.hpp"
 
-MIDISerialIn::MIDISerialIn(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDISerialIn", lua_table),SerialIn(lua_name, lua_table), CoreMIDIIn(lua_name, lua_table) {
+MIDISerialIn::MIDISerialIn(const std::string &lua_name, sol::table &lua_table): Input(lua_name, "MIDISerialIn", lua_table),SerialIn(lua_name, lua_table), CoreMIDIIn(lua_name, lua_table) {}
+
+bool MIDISerialIn::try_to_use_device(struct udev *udev, struct udev_device *device, sol::state &lua) {
+    std::string sysname = std::string("/dev/")+udev_device_get_sysname(device);
+    if (sysname != Serial::sysname) {
+        return false;
+    }
+    Serial::try_to_use_device(udev, device, lua);
     std::cout << "Waiting for midi control signal from " << lua_name << std::endl;
-	do read(fd, buf, 1);
+    unsigned char buf[1];
+    do read(fd, buf, 1);
     while (buf[0] >> 7u == 0);
+    return false;
 }
 
-bool MIDISerialIn::try_to_use_device(struct udev * udev, struct udev_device * device, sol::state &lua) {
-    return false;
-}
-bool MIDISerialIn::try_disconnect(const std::string &sysname,sol::state *lua) {
-    return false;
-}
 void MIDISerialIn::tick(sol::state& lua) {
     if (!isValid()) return;
 
@@ -79,8 +83,4 @@ void MIDISerialIn::tick(sol::state& lua) {
 
         /* parse MIDI message */
     else parse_midi_command(buf, lua);
-}
-
-void MIDISerialIn::send_message(unsigned char *buf) {
-
 }

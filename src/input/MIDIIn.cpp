@@ -53,7 +53,3 @@ void MIDIIn::tick(sol::state& lua) {
 bool MIDIIn::isValid() const {
     return midiin->isPortOpen();
 }
-
-void MIDIIn::send_message(unsigned char *buf) {
-
-}
