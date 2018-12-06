@@ -75,11 +75,6 @@ namespace buttons_ref {
                     ABS_RX,
                     ABS_RY,
                     ABS_RZ,
-                    ABS_THROTTLE,
-                    ABS_RUDDER,
-                    ABS_WHEEL,
-                    ABS_GAS,
-                    ABS_BRAKE,
                     ABS_HAT0X,
                     ABS_HAT0Y,
                     ABS_HAT1X,
@@ -87,7 +82,12 @@ namespace buttons_ref {
                     ABS_HAT2X,
                     ABS_HAT2Y,
                     ABS_HAT3X,
-                    ABS_HAT3Y
+                    ABS_HAT3Y,
+                    ABS_THROTTLE,
+                    ABS_RUDDER,
+                    ABS_WHEEL,
+                    ABS_GAS,
+                    ABS_BRAKE,
             };
 
 }//namespace buttons_ref

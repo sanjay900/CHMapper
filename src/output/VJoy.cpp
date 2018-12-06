@@ -34,6 +34,11 @@ VJoy::VJoy(const std::string &lua_name, sol::table &lua_table) : lua_table(lua_t
     struct libevdev *dev;
     dev = libevdev_new();
     libevdev_set_name(dev, dev_name.c_str());
+    libevdev_set_id_bustype(dev, 3);
+    libevdev_set_id_vendor(dev, 1118);
+    libevdev_set_id_product(dev, 654);
+    libevdev_set_id_version(dev, 276);
+
     for (unsigned int i = 0; i < buttons && i < BUTTONS_SIZE; i++) {
         libevdev_enable_event_code(dev, EV_KEY, buttons_ref::BUTTONS[i], nullptr);
     }
