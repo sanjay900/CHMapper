@@ -70,7 +70,9 @@ void Loop::tick() {
         long current = std::chrono::duration_cast<std::chrono::microseconds>(
                 std::chrono::system_clock::now().time_since_epoch()
         ).count();
-        lua["tick"](current-last);
+        if (lua["tick"]) {
+            lua["tick"](current-last);
+        }
         last = current;
         for (auto &device : sorted_inputs) {
             device->tick(lua);

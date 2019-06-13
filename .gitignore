@@ -76,3 +76,6 @@ CTestTestfile.cmake
 
 
 # End of https://www.gitignore.io/api/cmake,clion+iml
+.vscode
+*.a
+sanpie

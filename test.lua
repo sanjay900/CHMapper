@@ -63,8 +63,8 @@ v_devices = {
     -- },
     vdrums0 = {
         buttons = 11,
-        axes = 8,
-        guitar = false
+        axes = 6,
+        guitar = true
     },
     --    serial = {
     --        type = "serial",
@@ -87,7 +87,7 @@ function tick(usec)
     count = count + usec
     if count > 100000 then
         for k, v in pairs(v_devices) do
-            if string.starts(k, "vdrums") then
+            if string.starts(k, "vguitar") and v.guitar then
                 for i = 0,v.buttons do
                     v.send_button(i,false)
                 end
@@ -98,6 +98,49 @@ function tick(usec)
     end
 end
 current = -1;
+function serial_in(device, byte)
+    if byte == 128 then
+        current = 0;
+    end
+    if current >= 0 then
+        if current < 10 and current > 0 then v_devices.vguitar2.send_button(current-1,byte==1) end
+        if current == 10 then v_devices.vguitar2.send_axis(0, (byte-32)*1024) end
+        if current == 11 then v_devices.vguitar2.send_axis(1, (byte-32)*1024) end
+        if current == 12 then v_devices.vguitar2.send_axis(2, (byte-15)*2048) end
+        if current == 13 then
+            if byte == 1 then
+                v_devices.vguitar2.send_axis(3, 32767);
+            else
+                v_devices.vguitar2.send_axis(3, 0);
+            end
+        end
+        current= current+1;
+    end
+end
+function midi_in_note_on(device, channel, key, velocity)
+    --    if velocity ~= 0 then
+    --        local hz = math.floor(math.pow(2,(key-69) / 12) * (440))
+    --        local duration = 100
+    --        v_devices.nxt.write({6, 0, 0, 3, hz&0xff, hz >> 8, duration&0xff, duration >> 8})
+    --    end
+    -- local key2 = math.ceil(((key-41)/2));
+    -- if key2 == 0 then v_devices.serial1.write({10, velocity>0}) end
+    -- if key2 == 1 then v_devices.serial1.write({11, velocity>0}) end
+    -- if key2 == 2 then v_devices.serial1.write({12, velocity>0}) end
+    -- if key2 == 3 then v_devices.serial1.write({13, velocity>0}) end
+    -- if key2 == 4 then v_devices.serial1.write({5, velocity>0}) end
+    -- if key2 == 5 then v_devices.serial1.write({6, velocity>0}) end
+    -- if key2 == 6 then v_devices.serial1.write({9, velocity>0}) end
+    if (key >= 41 and (key-41)/2 < 9) then
+        v_devices.vguitar3.send_button((key-41)/2,velocity ~= 0)
+    end
+    if key >= 65 and (key-65)/2 < 9 then
+        v_devices.vguitar3.send_button((key-65)/2,velocity ~= 0)
+    end
+end
+function midi_in(device, param1, param2, param3)
+    -- v_devices.midi.write(param1, param2, param3)
+end
 function disconnect_event(device)
     local name = device.name;
     local vDev = v_devices["v"..name];
@@ -107,7 +150,6 @@ function disconnect_event(device)
     end
 end
 
-drum_mappings_a = {0,3,4,1,2,5}
 function axis_event(device, axis, value)
     local name = device.name;
     local vDev = v_devices["v"..name];
@@ -136,56 +178,30 @@ function axis_event(device, axis, value)
             if value <= -32767 then
                 vDev.send_axis(3,-32767)
             else
-                vDev.send_axis(3,value - 32767/2)
+                vDev.send_axis(3,value/2 + 32767/2 - 3000)
             end
         end
     elseif string.starts(name,"drums") then
         if device.type == "Drums" then
-            -- local vel = math.scale(value,-32767,0, 0, 127)
-            -- vel = math.min(127,vel)
-            -- --            v_devices.midi.note(1,50+axis,vel)
-            -- if axis == 7 then
-            --     v_devices.vguitar0.send_button(8,value > 0)
-            -- end
-            if vDev.guitar then
-                if axis < 2 then
-                    if value < -1000 then
-                        vDev.send_button(axis+10,true)
-                        vDev.send_button(axis+12,false)
-                    elseif value > 1000 then
-                        vDev.send_button(axis+12,true)
-                        vDev.send_button(axis+10,false)
-                    else
-                        vDev.send_button(axis+10,false)
-                        vDev.send_button(axis+12,false)
-                    end
-                elseif value > -32767 then
-                    vDev.send_button(axis,true)
-                    count = 0
-                else
-                    vDev.send_button(axis,false)
-                end
-            else
-                if axis == 0 then
-                    if value > 32767 / 2 then
-                        vDev.send_axis(6,32767)
-                    elseif value < -32767 / 2 then
-                        vDev.send_axis(6,-32767)
-                    else
-                        vDev.send_axis(6,0)
-                    end
-                elseif axis == 1 then
-                    if value > 32767 / 2 then
-                        vDev.send_axis(7,-32767)
-                    elseif value < -32767 / 2 then
-                        vDev.send_axis(7,32767)
-                    else
-                        vDev.send_axis(7,0)
-                    end
-                else
-                    vDev.send_button(drum_mappings_a[axis-1],value > -32767)
-                end
+            local vel = math.scale(value,-32767,0, 0, 127)
+            vel = math.min(127,vel)
+            --            v_devices.midi.note(1,50+axis,vel)
+            if axis == 7 then
+                v_devices.vguitar0.send_button(8,value > 0)
             end
+
+        end
+        if vDev.guitar then
+            if axis < 2 then
+                vDev.send_axis(axis,value)
+            elseif value > -32767 then
+                vDev.send_button(axis,true)
+                count = 0
+            else
+                vDev.send_button(axis,false)
+            end
+        else
+            vDev.send_axis(axis,value)
         end
     end
 end
@@ -204,6 +220,6 @@ function button_event(device, button, value)
             vDev.send_button(guitar_mappings[button+1], value)
         end
     elseif string.starts(name,"drums") then
-        vDev.send_button(7-button, value)
+        vDev.send_button(button, value)
     end
 end
