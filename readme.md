@@ -16,3 +16,8 @@ And as outputs, it supports:
 -  Keyboard
 -  MIDI
 -  Serial
+
+Requirements:
+- evdev (libevdev-dev on ubuntu)
+- rtmidi 
+- system modules enabled for uinput and evdev (modprobe uinput and modprobe evdev)
