@@ -69,9 +69,9 @@ function axis_event(device, axis, value)
             end
         elseif axis == 3 then
             if value <= -32767 then
-                vDev.send_axis(3,-32767)
+                vDev.send_axis(3,0)
             else
-                vDev.send_axis(3,value - 32767/2)
+                vDev.send_axis(3,value + 32767)
             end
         end
     end
