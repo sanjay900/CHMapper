@@ -19,19 +19,19 @@ devices = {
 v_devices = {
     vguitar0 = {
         buttons = 11,
-        axes = 6
+        axes = 8
     },
     vguitar1 = {
         buttons = 11,
-        axes = 6
+        axes = 8
     },
     vguitar2 = {
         buttons = 11,
-        axes = 6
+        axes = 8
     },
     vguitar3 = {
         buttons = 11,
-        axes = 6
+        axes = 8
     }
 }
 function disconnect_event(device)
@@ -48,8 +48,8 @@ function axis_event(device, axis, value)
     local vDev = v_devices["v"..name];
     if string.starts(name,"guitar") then
         if device.type == "Accelerometer" then
-            if axis == 0 then
-                vDev.send_axis(4,math.max(math.pow((10000 - value),1.25),32768))
+            if axis == 1 then
+                vDev.send_axis(4,math.min((value * 10) + (32768 / 2),0))
             end
         elseif axis == 0 then
             if value > 32767 / 2 then
