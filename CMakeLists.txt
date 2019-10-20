@@ -1,37 +1,18 @@
 set(CMAKE_BUILD_TYPE Debug)
 cmake_minimum_required(VERSION 3.10)
-project(sanpie)
-set(LIB_SOURCE_FILES
-        src/sol.hpp
-        src/input/Input.cpp
-        src/input/Wiimote.cpp
-        src/DeviceException.cpp
-        src/output/VJoy.cpp
-        src/output/buttons_ref.h
-        src/output/VKeyboard.cpp
-        src/input/MIDISerialIn.cpp
-        src/input/MIDIIn.cpp
-        src/output/VMIDI.cpp
-        src/Loop.cpp
-        src/Utils.cpp
-        src/DeviceScanner.cpp
-        src/input/CoreMIDIIn.cpp
-        src/input/SerialIn.cpp
-        src/input/Controller.cpp
-        src/Serial.cpp
-        src/output/SerialOut.cpp
-        src/output/SerialOut.h src/output/Output.cpp src/output/Output.hpp src/Device.cpp src/Device.hpp)
+project(chmapper)
+set(LIB_SOURCE_FILES src/scanner.cpp src/DeviceException.cpp src/input/Input.cpp src/input/WiiController.cpp)
 
-add_library(libsanpie ${LIB_SOURCE_FILES})
+add_library(libchmapper ${LIB_SOURCE_FILES})
 
-target_compile_features(libsanpie PUBLIC cxx_std_17)
-target_include_directories(libsanpie PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(libchmapper PUBLIC cxx_std_17)
+target_include_directories(libchmapper PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(EXE_SOURCE_FILES src/main.cpp)
-add_executable(sanpie ${EXE_SOURCE_FILES})
+add_executable(chmapper ${EXE_SOURCE_FILES})
 
-target_compile_features(sanpie PUBLIC cxx_std_17)
+target_compile_features(chmapper PUBLIC cxx_std_17)
 
-TARGET_LINK_LIBRARIES(libsanpie udev pthread evdev lua rtmidi)
+TARGET_LINK_LIBRARIES(libchmapper udev pthread evdev lua rtmidi)
 
-TARGET_LINK_LIBRARIES(sanpie libsanpie)
+TARGET_LINK_LIBRARIES(chmapper libchmapper)

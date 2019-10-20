@@ -1,29 +1,25 @@
 #include <iostream>
 #include <libudev.h>
-#include "sol.hpp"
-#include "src/input/Input.hpp"
-#include "DeviceException.hpp"
 #include <chrono>
 #include <thread>
-#include <src/Loop.hpp>
 #include <fcntl.h>
 #include <zconf.h>
-#include "Utils.hpp"
-#include "DeviceScanner.hpp"
+#include "scanner.h"
+#include "input/Input.h"
+#include <list>
 
-int main(int argc, char *argv[]) {
-    sol::state lua;
-    lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::string, sol::lib::io, sol::lib::math);
-    if (argc < 0) {
-        std::cerr << "A script is required as the first argument" << std::endl;
+int main(int argc, char *argv[])
+{
+    std::list<Input *> inputs;
+    Scanner *scanner = new Scanner();
+    scanner->scan(&inputs);
+    //Scan twice, once to pick up wiimotes, and once to pick up their extensions.
+    scanner->scan(&inputs);
+    while (true) {
+        scanner->findNew(&inputs);
+        for (auto x: inputs) {
+            x->tick();
+        }
     }
-    lua.script_file(argv[1]);
-    Utils::register_utils(lua);
-    new DeviceScanner(lua);
-    Loop loop = Loop(lua);
-    std::cout << "Press 'q' and then 'ENTER' to quit!\n";
-    while (getchar() != 'q');
-    loop.stop();
-    sleep(1);
     return 0;
 }

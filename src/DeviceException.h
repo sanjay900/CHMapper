@@ -1,9 +1,4 @@
-//
-// Created by sanjay on 4/07/18.
-//
-
-#ifndef WEJOY_CONTROLLEREXCEPTION_H
-#define WEJOY_CONTROLLEREXCEPTION_H
+#pragma once
 
 
 #include <exception>
@@ -19,4 +14,3 @@ public:
         return message_.c_str();
     }
 };
-#endif
