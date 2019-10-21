@@ -13,6 +13,6 @@ add_executable(chmapper ${EXE_SOURCE_FILES})
 
 target_compile_features(chmapper PUBLIC cxx_std_17)
 
-TARGET_LINK_LIBRARIES(libchmapper udev pthread evdev lua rtmidi)
+TARGET_LINK_LIBRARIES(libchmapper udev evdev)
 
 TARGET_LINK_LIBRARIES(chmapper libchmapper)

@@ -3,7 +3,7 @@
 void PS3::init()
 {
     Input::init();
-    std::cout << "PS3" << std::endl;
+    std::cout << "PS3 Controller Detected" << std::endl;
     buttonMap[BTN_EAST] = BTN_SOUTH;
     buttonMap[BTN_C] = BTN_EAST;
     buttonMap[BTN_NORTH] = BTN_WEST;

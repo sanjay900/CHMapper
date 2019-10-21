@@ -5,7 +5,6 @@ static int buttons[] = {BTN_SOUTH, BTN_EAST, BTN_NORTH, BTN_WEST, BTN_SELECT, BT
 void WiiController::add_child(Input *input)
 {
     const std::string found_ext = std::string(libevdev_get_name(input->_dev)).substr(std::string("Nintendo Wii Remote ").size());
-    std::cout << found_ext << std::endl;
     if (found_ext == "Accelerometer")
     {
         accel = input;
@@ -21,6 +20,7 @@ void WiiController::add_child(Input *input)
         return;
     }
 
+    std::cout << found_ext << " Detected" << std::endl;
     extension = input;
     isGuitar = found_ext == "Guitar";
     if (isGuitar)
