@@ -53,7 +53,7 @@ void Input::tick()
                     int signum = std::signbit(a->second);
                     auto ax = std::abs(a->second);
                     auto a2 = axis[ax];
-                    auto val = ev.value ? (signum ? a2.minimum : a2.maximum) : 0;
+                    auto val = ev.value ? (signum ? a2.maximum : a2.minimum) : 0;
                     libevdev_uinput_write_event(uidev, EV_ABS, ax, val);
                     libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
                 }

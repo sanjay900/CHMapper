@@ -20,7 +20,7 @@ void WiiController::add_child(Input *input)
         return;
     }
 
-    std::cout << found_ext << " Detected" << std::endl;
+    std::cout << "Wii " << found_ext << " Connected" << std::endl;
     extension = input;
     isGuitar = found_ext == "Guitar";
     if (isGuitar)
@@ -37,6 +37,8 @@ void WiiController::add_child(Input *input)
         input->buttonMap[BTN_5] = BTN_TL;
         input->axisMap[ABS_X] = ABS_HAT0X;
         input->axisMap[ABS_Y] = ABS_HAT0Y;
+        //Guitar joystick is upside down
+        input->axisMapScaled[ABS_Y] = [](int val) {return -val;};
         input->axisMap[ABS_HAT1X] = ABS_RX;
         input->axisMapScaled[ABS_HAT1X] = [](int val) { return std::min(val * 3, 32768); };
     }

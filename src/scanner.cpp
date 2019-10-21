@@ -69,13 +69,17 @@ Input *Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
     Input *input = nullptr;
     if (found_name == "Nintendo Wii Remote")
     {
+        std::cout << "Wii Remote Detected" << std::endl;
         input = new WiiController(udev_device_get_syspath(dev), _dev);
     }
-    if (vid == 0x289b && pid == 0x002b) {
+    if (vid == 0x289b && pid == 0x002b)
+    {
+        std::cout << "Raphnet Controller Detected" << std::endl;
         input = new Raphnet(udev_device_get_syspath(dev), _dev);
     }
     if (vid == 0x12ba)
     {
+        std::cout << "PS3 Controller Detected" << std::endl;
         input = new PS3(udev_device_get_syspath(dev), _dev);
     }
     // construct and then call init function
