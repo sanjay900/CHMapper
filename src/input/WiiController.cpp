@@ -9,6 +9,11 @@ void WiiController::add_child(Input *input)
     if (found_ext == "Accelerometer")
     {
         accel = input;
+        //Handle guitar detection before accelerometer
+        if (isGuitar) {
+            accel->axisMap[ABS_RY] = ABS_RY;
+            accel->axisMapScaled[ABS_RY] = [](int val) { return std::min((val * 10) + (32768 / 2), 0); };
+        }
         return;
     }
     if (found_ext == "IR")
@@ -17,10 +22,14 @@ void WiiController::add_child(Input *input)
     }
 
     extension = input;
-    if (found_ext == "Guitar")
+    isGuitar = found_ext == "Guitar";
+    if (isGuitar)
     {
-        accel->axisMap[ABS_RY] = ABS_Y;
-        accel->axisMapScaled[ABS_RY] = [](int val) { return std::min((val * 10) + (32768 / 2), 0); };
+        if (accel != nullptr)
+        {
+            accel->axisMap[ABS_RY] = ABS_RY;
+            accel->axisMapScaled[ABS_RY] = [](int val) { return std::min((val * 10) + (32768 / 2), 0); };
+        }
         input->buttonMap[BTN_1] = BTN_SOUTH;
         input->buttonMap[BTN_2] = BTN_EAST;
         input->buttonMap[BTN_3] = BTN_WEST;
@@ -28,9 +37,10 @@ void WiiController::add_child(Input *input)
         input->buttonMap[BTN_5] = BTN_TL;
         input->axisMap[ABS_X] = ABS_HAT0X;
         input->axisMap[ABS_Y] = ABS_HAT0Y;
-        input->axisMap[ABS_HAT1X] = ABS_X;
+        input->axisMap[ABS_HAT1X] = ABS_RX;
+        input->axisMapScaled[ABS_HAT1X] = [](int val) { return std::min(val * 3, 32768); };
     }
-    else
+    else if (accel != nullptr)
     {
         accel->axisMap.erase(ABS_Y);
         accel->axisMapScaled.erase(ABS_Y);

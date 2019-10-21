@@ -70,7 +70,7 @@ void Input::tick()
             auto a2 = axis[a->second];
             //How fast is this, should we be caching this?
             int val = scale(ev.value, libevdev_get_abs_minimum(_dev, ev.code), libevdev_get_abs_maximum(_dev, ev.code), a2.minimum, a2.maximum);
-            auto func = axisMapScaled[a->second];
+            auto func = axisMapScaled[ev.code];
             if (func != nullptr)
             {
                 val = func(val);
