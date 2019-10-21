@@ -27,18 +27,14 @@ Scanner::Scanner()
     tm.tv_sec = 0;
     tm.tv_usec = 0;
 }
-Input *Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
+void Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
 {
     std::string dev_name = udev_device_get_sysname(dev);
-    auto s = "/sys/devices/virtual";
     auto sysname = udev_device_get_syspath(dev);
-    //Ignore virtual devices, as udev_enumerate breaks
-    if (!strncmp(sysname, s, strlen(s)))
-        return nullptr;
     auto it = std::find_if(inputs->begin(), inputs->end(), [sysname](const Input *m) -> bool { return m->dev == sysname; });
     if (it != inputs->end())
     {
-        return nullptr;
+        return;
     }
     const std::string devpath = "/dev/input/" + dev_name;
     int fd = open(devpath.c_str(), O_RDONLY | O_NONBLOCK);
@@ -46,21 +42,22 @@ Input *Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
     int rc = libevdev_new_from_fd(fd, &_dev);
     if (rc < 0)
     {
-        // std::cout << "skipped" << dev_name << std::endl;
         close(fd);
-        return nullptr;
+        return;
     }
     //Look for wii extensions, and associate them with their respective controllers.
     for (auto in : *inputs)
     {
+        if (!in->has_children())
+            continue;
         auto inBth = udev_device_get_syspath(udev_device_get_parent(udev_device_get_parent(udev_device_new_from_syspath(udev, in->dev.c_str()))));
         auto devBth = udev_device_get_syspath(udev_device_get_parent(udev_device_get_parent(dev)));
-        if (std::string(inBth) == devBth)
+        if (inBth != nullptr && devBth != nullptr && std::string(inBth) == devBth)
         {
-            Input *c = new Input(udev_device_get_syspath(dev), _dev, in->uidev);
+            Input *c = new Input("unknown", sysname, _dev, in->uidev);
             in->add_child(c);
             inputs->push_back(c);
-            return nullptr;
+            return;
         }
     }
     const std::string found_name = libevdev_get_name(_dev);
@@ -69,25 +66,22 @@ Input *Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
     Input *input = nullptr;
     if (found_name == "Nintendo Wii Remote")
     {
-        std::cout << "Wii Remote Detected" << std::endl;
-        input = new WiiController(udev_device_get_syspath(dev), _dev);
+        input = new WiiController("Wii Remote", sysname, _dev);
     }
     if (vid == 0x289b && pid == 0x002b)
     {
-        std::cout << "Raphnet Controller Detected" << std::endl;
-        input = new Raphnet(udev_device_get_syspath(dev), _dev);
+        input = new Raphnet("Raphnet wusbmote", sysname, _dev);
     }
     if (vid == 0x12ba)
     {
-        std::cout << "PS3 Controller Detected" << std::endl;
-        input = new PS3(udev_device_get_syspath(dev), _dev);
+        input = new PS3("PS3 Controller", sysname, _dev);
     }
     // construct and then call init function
     if (input != nullptr)
     {
         input->init();
+        inputs->push_back(input);
     }
-    return input;
 }
 void Scanner::scan(std::list<Input *> *inputs)
 {
@@ -124,11 +118,7 @@ void Scanner::scan(std::list<Input *> *inputs)
         dev = udev_device_new_from_syspath(udev, path);
         if (dev == nullptr)
             continue;
-        Input *i = construct(dev, inputs);
-        if (i != nullptr)
-        {
-            inputs->push_back(i);
-        }
+        construct(dev, inputs);
         udev_device_unref(dev);
     }
     /* free enumerate */
@@ -143,15 +133,11 @@ void Scanner::findNew(std::list<Input *> *inputs)
         if (FD_ISSET(fd, &fds))
         {
             struct udev_device *dev = udev_monitor_receive_device(mon);
-            const std::string sysname = udev_device_get_sysname(dev);
+            const std::string sysname = udev_device_get_syspath(dev);
             const std::string action = udev_device_get_action(dev);
             if (action == "add")
             {
-                Input *i = construct(dev, inputs);
-                if (i != nullptr)
-                {
-                    inputs->push_back(i);
-                }
+                construct(dev, inputs);
             }
             else if (action == "remove")
             {

@@ -8,10 +8,12 @@
 class Input
 {
 public:
-    Input(std::string dev, struct libevdev *_dev);
+    Input(std::string name, std::string dev, struct libevdev *_dev);
     //used by wii extensions
-    Input(std::string dev, struct libevdev *_dev, struct libevdev_uinput *uidev);
+    Input(std::string name, std::string dev, struct libevdev *_dev, struct libevdev_uinput *uidev);
     std::string dev;
+    std::string name;
+    bool child;
     //Input evdev device
     struct libevdev *_dev;
     //uinput device
@@ -22,6 +24,7 @@ public:
     std::map<int,std::function<int(int)>> axisMapScaled;
     //Map a button from the original controller to one on the new controller
     std::map<int,int> buttonMap;
+    virtual bool has_children();
     void disconnect();
     void tick();
     virtual void init();

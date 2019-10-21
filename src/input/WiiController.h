@@ -6,4 +6,5 @@ class WiiController: public Input {
     bool isGuitar;
     using Input::Input;
     void add_child(Input* input);
+    bool has_children();
 };

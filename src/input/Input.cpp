@@ -8,18 +8,20 @@ static int buttons[] = {BTN_SOUTH, BTN_EAST, BTN_NORTH, BTN_WEST, BTN_TL, BTN_TR
 std::unordered_map<int, input_absinfo> axis = {
     {ABS_X, {0, -32768, 32767}}, {ABS_Y, {0, -32768, 32767}}, {ABS_Z, {0, 0, 255}}, {ABS_RX, {0, -32768, 32767}}, {ABS_RY, {0, -32768, 32767}}, {ABS_RZ, {0, 0, 255}}, {ABS_HAT0X, {0, -1, 1}}, {ABS_HAT0Y, {0, -1, 1}}};
 
-Input::Input(std::string dev, struct libevdev *_dev) : dev(dev), _dev(_dev)
+Input::Input(std::string name, std::string dev, struct libevdev *_dev) : name(name), dev(dev), _dev(_dev), child(false)
 {
     libevdev_grab(_dev, LIBEVDEV_GRAB);
 }
-Input::Input(std::string dev, struct libevdev *_dev, struct libevdev_uinput *uidev) : dev(dev), _dev(_dev), uidev(uidev)
+Input::Input(std::string name, std::string dev, struct libevdev *_dev, struct libevdev_uinput *uidev) : name(name), dev(dev), _dev(_dev), uidev(uidev), child(true)
 {
     libevdev_grab(_dev, LIBEVDEV_GRAB);
 }
 void Input::disconnect()
 {
-    std::cout << "Device has disconnected" << std::endl;
-    libevdev_uinput_destroy(uidev);
+    std::cout << name << " Disconnected!" << std::endl;
+    if (!child) {
+        libevdev_uinput_destroy(uidev);
+    }
 }
 void Input::add_child(Input *input)
 {
@@ -49,10 +51,10 @@ void Input::tick()
                 a = axisMap.find(ev.code);
                 if (a != axisMap.end())
                 {
-                    int signum = std::signbit(a->second);
+                    auto sign = std::signbit(a->second);
                     auto ax = std::abs(a->second);
                     auto a2 = axis[ax];
-                    auto val = ev.value ? (signum ? a2.maximum : a2.minimum) : 0;
+                    auto val = ev.value ? (sign ? a2.maximum : a2.minimum) : 0;
                     libevdev_uinput_write_event(uidev, EV_ABS, ax, val);
                     libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
                 }
@@ -77,7 +79,8 @@ void Input::tick()
 
 void Input::init()
 {
-    std::string dev_name = "CHMapper Virtual Device";
+    std::cout << name << " Connected!" << std::endl;
+    std::string dev_name = name + " - CHMapper";
     struct libevdev *evdev;
     evdev = libevdev_new();
     libevdev_set_name(evdev, dev_name.c_str());
@@ -111,4 +114,7 @@ void Input::init()
         throw DeviceException(
             strerror(-err) + std::string(": Failed creating virtual device ") + dev_name + ".");
     }
+}
+bool Input::has_children() {
+    return false;
 }

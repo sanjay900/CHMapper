@@ -5,6 +5,7 @@ static int buttons[] = {BTN_SOUTH, BTN_EAST, BTN_NORTH, BTN_WEST, BTN_SELECT, BT
 void WiiController::add_child(Input *input)
 {
     const std::string found_ext = std::string(libevdev_get_name(input->_dev)).substr(std::string("Nintendo Wii Remote ").size());
+    input->name = "Wii " + found_ext;
     if (found_ext == "Accelerometer")
     {
         accel = input;
@@ -20,7 +21,7 @@ void WiiController::add_child(Input *input)
         return;
     }
 
-    std::cout << "Wii " << found_ext << " Connected" << std::endl;
+    std::cout << (input->name) << " Connected!" << std::endl;
     extension = input;
     isGuitar = found_ext == "Guitar";
     if (isGuitar)
@@ -72,4 +73,7 @@ void WiiController::add_child(Input *input)
         input->axisMap[ABS_HAT2Y] = ABS_RY;
         input->axisMap[ABS_HAT3X] = ABS_RZ;
     }
+}
+bool WiiController::has_children() {
+    return true;
 }

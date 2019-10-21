@@ -7,7 +7,7 @@ public:
     Scanner();
     void scan(std::list<Input*> *inputs);
     void findNew(std::list<Input*> *inputs);
-    Input* construct(udev_device *device, std::list<Input*> *inputs);
+    void construct(udev_device *device, std::list<Input*> *inputs);
 
 private:
     struct udev_monitor *mon;
