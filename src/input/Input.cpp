@@ -97,6 +97,16 @@ void Input::init()
     int err = libevdev_uinput_create_from_device(evdev,
                                                  LIBEVDEV_UINPUT_OPEN_MANAGED,
                                                  &uidev);
+    if (err == -ENOENT) {
+        std::cout << "Unable to communicate with uinput module, attempting to enable." << std::endl;
+        system("sudo modprobe uinput");
+        int err = libevdev_uinput_create_from_device(evdev,
+                                                 LIBEVDEV_UINPUT_OPEN_MANAGED,
+                                                 &uidev);
+        if (err == -ENOENT) {
+            std::cout << "Unable to automatically load uinput, please install it and then run sudo modprobe uinput" << std::endl;
+        }
+    }
     if (err != 0)
     {
         throw DeviceException(
