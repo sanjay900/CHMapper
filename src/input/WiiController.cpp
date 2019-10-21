@@ -1,7 +1,7 @@
 #include "WiiController.h"
 #include <iostream>
 #include <algorithm>
-static int buttons[] = {BTN_DPAD_UP, BTN_DPAD_DOWN, BTN_DPAD_LEFT, BTN_DPAD_RIGHT, BTN_SOUTH, BTN_EAST, BTN_NORTH, BTN_WEST, BTN_SELECT, BTN_START, BTN_MODE, BTN_THUMBL, BTN_THUMBR};
+static int buttons[] = {BTN_SOUTH, BTN_EAST, BTN_NORTH, BTN_WEST, BTN_SELECT, BTN_START, BTN_MODE, BTN_THUMBL, BTN_THUMBR};
 void WiiController::add_child(Input *input)
 {
     const std::string found_ext = std::string(libevdev_get_name(input->_dev)).substr(std::string("Nintendo Wii Remote ").size());
@@ -9,7 +9,7 @@ void WiiController::add_child(Input *input)
     if (found_ext == "Accelerometer")
     {
         accel = input;
-        //Handle guitar detection before accelerometer
+        //Handle guitar detection, if the accelerometer is detected after the guitar
         if (isGuitar) {
             accel->axisMap[ABS_RY] = ABS_RY;
             accel->axisMapScaled[ABS_RY] = [](int val) { return std::min((val * 10) + (32768 / 2), 0); };
@@ -53,10 +53,15 @@ void WiiController::add_child(Input *input)
     input->buttonMap[KEY_NEXT] = BTN_START;
     input->buttonMap[BTN_TL2] = BTN_TL;
     input->buttonMap[BTN_TR2] = BTN_TR;
-    input->buttonMap[KEY_UP] = BTN_DPAD_UP;
-    input->buttonMap[KEY_DOWN] = BTN_DPAD_DOWN;
-    input->buttonMap[KEY_LEFT] = BTN_DPAD_LEFT;
-    input->buttonMap[KEY_RIGHT] = BTN_DPAD_RIGHT;
+    //DPad -> hat mapping (classic uses key, guitar uses dpad)
+    input->axisMap[KEY_UP] = ABS_HAT0Y;
+    input->axisMap[KEY_DOWN] = -ABS_HAT0Y;
+    input->axisMap[KEY_LEFT] = ABS_HAT0X;
+    input->axisMap[KEY_RIGHT] = -ABS_HAT0X;
+    input->axisMap[BTN_DPAD_UP] = ABS_HAT0Y;
+    input->axisMap[BTN_DPAD_DOWN] = -ABS_HAT0Y;
+    input->axisMap[BTN_DPAD_LEFT] = ABS_HAT0X;
+    input->axisMap[BTN_DPAD_RIGHT] = -ABS_HAT0X;
     if (found_ext == "Classic Controller")
     {
         //Sticks are upside-down (i think)
