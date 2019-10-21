@@ -5,7 +5,6 @@
 #include "../DeviceException.h"
 
 static int buttons[] = {BTN_SOUTH, BTN_EAST, BTN_NORTH, BTN_WEST, BTN_TL, BTN_TR, BTN_SELECT, BTN_START, BTN_MODE, BTN_THUMBL, BTN_THUMBR};
-// static int axis[] = {ABS_X, ABS_Y, ABS_Z, ABS_RX, ABS_RY, ABS_RZ, ABS_HAT0X, ABS_HAT0Y};
 std::unordered_map<int, input_absinfo> axis = {
     {ABS_X, {0, -32768, 32767}}, {ABS_Y, {0, -32768, 32767}}, {ABS_Z, {0, 0, 255}}, {ABS_RX, {0, -32768, 32767}}, {ABS_RY, {0, -32768, 32767}}, {ABS_RZ, {0, 0, 255}}, {ABS_HAT0X, {0, -1, 1}}, {ABS_HAT0Y, {0, -1, 1}}};
 

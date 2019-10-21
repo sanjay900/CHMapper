@@ -55,7 +55,6 @@ void WiiController::add_child(Input *input)
     input->buttonMap[KEY_NEXT] = BTN_START;
     input->buttonMap[BTN_TL2] = BTN_TL;
     input->buttonMap[BTN_TR2] = BTN_TR;
-    //DPad -> hat mapping (classic uses key, guitar uses dpad)
     input->axisMap[KEY_UP] = ABS_HAT0Y;
     input->axisMap[KEY_DOWN] = -ABS_HAT0Y;
     input->axisMap[KEY_LEFT] = ABS_HAT0X;
@@ -66,7 +65,6 @@ void WiiController::add_child(Input *input)
     input->axisMap[BTN_DPAD_RIGHT] = -ABS_HAT0X;
     if (found_ext == "Classic Controller")
     {
-        //Sticks are upside-down (i think)
         input->axisMap[ABS_HAT1X] = ABS_X;
         input->axisMap[ABS_HAT1Y] = ABS_Y;
         input->axisMap[ABS_HAT3Y] = ABS_Z;
