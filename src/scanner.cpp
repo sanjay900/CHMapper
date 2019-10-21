@@ -74,7 +74,26 @@ void Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
     }
     if (vid == 0x12ba)
     {
-        input = new PS3("PS3 Controller", sysname, _dev);
+        if (pid == 0x0210)
+        {
+            input = new PS3("PS3 Rock Band Drum Kit", sysname, _dev);
+        }
+        else if (pid == 0x0200)
+        {
+            input = new PS3("PS3 Rock Band Guitar", sysname, _dev);
+        }
+        else if (pid == 0x0100)
+        {
+            input = new PS3("PS3 Guitar Hero Guitar", sysname, _dev);
+        }
+        else if (pid == 0x0120)
+        {
+            input = new PS3("PS3 Guitar Hero Drum Kit", sysname, _dev);
+        }
+        else
+        {
+            input = new PS3("PS3 Controller", sysname, _dev);
+        }
     }
     // construct and then call init function
     if (input != nullptr)
