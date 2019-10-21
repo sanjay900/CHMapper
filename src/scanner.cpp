@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "input/WiiController.h"
+#include "input/PS3.h"
 #include <string.h>
 Scanner::Scanner()
 {
@@ -69,8 +70,9 @@ Input *Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
     {
         input = new WiiController(udev_device_get_syspath(dev), _dev);
     }
-    // if (vid == 0x12ba)
-    // {
+    if (vid == 0x12ba)
+    {
+        input = new PS3(udev_device_get_syspath(dev), _dev);
     //     if (pid == 0x0210)
     //     {
     //         input = new PS3RBDrum(dev);
@@ -87,7 +89,7 @@ Input *Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
     //     {
     //         input = new PS3GHDrum(dev);
     //     }
-    // }
+    }
     // construct and then call init function
     if (input != nullptr)
     {
