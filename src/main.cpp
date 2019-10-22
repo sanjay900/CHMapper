@@ -7,9 +7,11 @@
 #include "scanner.h"
 #include "input/Input.h"
 #include <list>
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
+    std::cout << "Started CHMapper, waiting for Wii Guitar, PS3 Guitar or Raphnet Guitar" << std::endl;
     std::list<Input *> inputs;
     Scanner *scanner = new Scanner();
     scanner->scan(&inputs);

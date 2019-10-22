@@ -2,6 +2,7 @@
 #include <iostream>
 void PS3::init()
 {
+    //Slider is ABS_RZ
     Input::init();
     buttonMap[BTN_EAST] = BTN_SOUTH;
     buttonMap[BTN_C] = BTN_EAST;

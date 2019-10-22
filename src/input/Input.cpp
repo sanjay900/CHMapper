@@ -19,7 +19,8 @@ Input::Input(std::string name, std::string dev, struct libevdev *_dev, struct li
 void Input::disconnect()
 {
     std::cout << name << " Disconnected!" << std::endl;
-    if (!child) {
+    if (!child)
+    {
         libevdev_uinput_destroy(uidev);
     }
 }
@@ -33,7 +34,9 @@ int scale(int x, int in_min, int in_max, int out_min, int out_max)
 void Input::tick()
 {
     int rc;
-    struct input_event ev{};
+    struct input_event ev
+    {
+    };
     rc = libevdev_next_event(_dev, LIBEVDEV_READ_FLAG_NORMAL, &ev);
     if (rc == 0)
     {
@@ -99,13 +102,15 @@ void Input::init()
     int err = libevdev_uinput_create_from_device(evdev,
                                                  LIBEVDEV_UINPUT_OPEN_MANAGED,
                                                  &uidev);
-    if (err == -ENOENT) {
+    if (err == -ENOENT)
+    {
         std::cout << "Unable to communicate with uinput module, attempting to enable." << std::endl;
         system("sudo modprobe uinput");
         int err = libevdev_uinput_create_from_device(evdev,
-                                                 LIBEVDEV_UINPUT_OPEN_MANAGED,
-                                                 &uidev);
-        if (err == -ENOENT) {
+                                                     LIBEVDEV_UINPUT_OPEN_MANAGED,
+                                                     &uidev);
+        if (err == -ENOENT)
+        {
             std::cout << "Unable to automatically load uinput, please install it and then run sudo modprobe uinput" << std::endl;
         }
     }
@@ -115,6 +120,7 @@ void Input::init()
             strerror(-err) + std::string(": Failed creating virtual device ") + dev_name + ".");
     }
 }
-bool Input::has_children() {
+bool Input::has_children()
+{
     return false;
 }

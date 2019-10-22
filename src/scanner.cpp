@@ -72,6 +72,10 @@ void Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
     {
         input = new Raphnet("Raphnet wusbmote", sysname, _dev);
     }
+    if (vid == 0x1430 && pid == 0x474c)
+    {
+        input = new PS3("World Tour PC Guitar", sysname, _dev);
+    }
     if (vid == 0x12ba)
     {
         if (pid == 0x0210)
