@@ -11,7 +11,9 @@
 #include <gtk/gtk.h>
 
 GtkTextBuffer *buffer;
-Scanner *scanner;
+GtkWidget *window;
+Scanner *scanner = nullptr;
+guint tag;
 std::list<Input *> inputs;
 static gboolean
 on_timeout (gpointer user_data) {
@@ -19,11 +21,32 @@ on_timeout (gpointer user_data) {
     for (auto x: inputs) {
         x->tick();
     }
+    return true;
+}
+void startScanning (GtkWidget *widget, gpointer *data)
+{
+    std::cout << "start" << std::endl;
+    scanner = new Scanner(buffer);
+    scanner->scan(&inputs);
+    //Scan twice, once to pick up wiimotes, and once to pick up their extensions.
+    scanner->scan(&inputs);
+    tag = g_timeout_add (100, on_timeout, window);
+}
+void stopScanning (GtkWidget *widget, gpointer *data)
+{
+    if(scanner != nullptr) {
+        for (auto in: inputs) {
+            in->disconnect();
+        }
+        inputs.clear();
+
+        g_source_remove(tag);
+        scanner = nullptr;
+    }
 }
 static void
 activate(GtkApplication *app,
     gpointer user_data) {
-    GtkWidget *window;
 
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "CHMapper");
@@ -33,15 +56,19 @@ activate(GtkApplication *app,
     gtk_text_view_set_editable(GTK_TEXT_VIEW(view), false);
 
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+    GtkWidget *start = gtk_button_new_with_label("Start");
+    GtkWidget *stop = gtk_button_new_with_label("Stop");
+    //Find out how to lay this out correctly
     gtk_container_add (GTK_CONTAINER(window), view);
+    gtk_container_add (GTK_CONTAINER(window), start);
+    gtk_container_add (GTK_CONTAINER(window), stop);
+    g_signal_connect (start, "clicked",
+		      G_CALLBACK (startScanning), NULL);
+    g_signal_connect (stop, "clicked",
+		      G_CALLBACK (stopScanning), NULL);
     gtk_widget_show_all(window);
     gtk_text_buffer_insert_at_cursor (buffer, "Started CHMapper, waiting for a Wii Guitar, PS3 Guitar or Raphnet Guitar\n\n", -1);
     
-    scanner = new Scanner(buffer);
-    scanner->scan(&inputs);
-    //Scan twice, once to pick up wiimotes, and once to pick up their extensions.
-    scanner->scan(&inputs);
-    g_timeout_add (100, on_timeout, window);
 }
 
 int main(int argc, char *argv[])
