@@ -19,7 +19,7 @@ Input::Input(GtkTextBuffer *buffer, std::string name, std::string dev, struct li
 void Input::disconnect()
 {
     gtk_text_buffer_insert_at_cursor (buffer, name.c_str(), -1);
-    gtk_text_buffer_insert_at_cursor (buffer, " Disconnected!\n\n", -1);
+    gtk_text_buffer_insert_at_cursor (buffer, " Disconnected!\n", -1);
     if (!child)
     {
         libevdev_uinput_destroy(uidev);
@@ -103,21 +103,8 @@ void Input::init()
     }
     int err = libevdev_uinput_create_from_device(evdev,
                                                  LIBEVDEV_UINPUT_OPEN_MANAGED,
-                                                 &uidev);
-                                                 
-    
-
-    if (err == -ENOENT)
-    {
-        gtk_text_buffer_insert_at_cursor (buffer, "The was a problem creating a virtual controller, the below command may help:\n", -1);
-        gtk_text_buffer_insert_at_cursor (buffer, "sudo modprobe uinput\n\n", -1);
-    } else if (err == -EACCES)
-    {
-        gtk_text_buffer_insert_at_cursor (buffer, "The was a problem creating a virtual controller, the below commands may help: \n", -1);
-        gtk_text_buffer_insert_at_cursor (buffer, "sudo echo 'KERNEL==\"uinput\", MODE=\"0666\"' > /etc/udev/rules.d/50-uinput.rules\n", -1);
-        gtk_text_buffer_insert_at_cursor (buffer, "sudo udevadm control --reload-rules`\n", -1);
-        gtk_text_buffer_insert_at_cursor (buffer, "sudo udevadm trigger\n\n", -1);
-    } else if (err != 0)
+                                                 &uidev);                                             
+    if (err != 0)
     {
         gtk_text_buffer_insert_at_cursor (buffer, strerror(-err), -1);
         gtk_text_buffer_insert_at_cursor (buffer, ": Failed creating virtual device ", -1);
