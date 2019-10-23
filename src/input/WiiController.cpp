@@ -20,7 +20,7 @@ void WiiController::add_child(Input *input)
     {
         return;
     }
-
+    
     std::cout << (input->name) << " Connected!" << std::endl;
     extension = input;
     isGuitar = found_ext == "Guitar";

@@ -8,17 +8,18 @@ static int buttons[] = {BTN_SOUTH, BTN_EAST, BTN_NORTH, BTN_WEST, BTN_TL, BTN_TR
 std::unordered_map<int, input_absinfo> axis = {
     {ABS_X, {0, -32768, 32767}}, {ABS_Y, {0, -32768, 32767}}, {ABS_Z, {0, 0, 255}}, {ABS_RX, {0, -32768, 32767}}, {ABS_RY, {0, -32768, 32767}}, {ABS_RZ, {0, 0, 255}}, {ABS_HAT0X, {0, -1, 1}}, {ABS_HAT0Y, {0, -1, 1}}};
 
-Input::Input(std::string name, std::string dev, struct libevdev *_dev) : name(name), dev(dev), _dev(_dev), child(false)
+Input::Input(GtkTextBuffer *buffer, std::string name, std::string dev, struct libevdev *_dev) : buffer(buffer), name(name), dev(dev), _dev(_dev), child(false)
 {
     libevdev_grab(_dev, LIBEVDEV_GRAB);
 }
-Input::Input(std::string name, std::string dev, struct libevdev *_dev, struct libevdev_uinput *uidev) : name(name), dev(dev), _dev(_dev), uidev(uidev), child(true)
+Input::Input(GtkTextBuffer *buffer, std::string name, std::string dev, struct libevdev *_dev, struct libevdev_uinput *uidev) : buffer(buffer), name(name), dev(dev), _dev(_dev), uidev(uidev), child(true)
 {
     libevdev_grab(_dev, LIBEVDEV_GRAB);
 }
 void Input::disconnect()
 {
-    std::cout << name << " Disconnected!" << std::endl;
+    gtk_text_buffer_insert_at_cursor (buffer, name.c_str(), -1);
+    gtk_text_buffer_insert_at_cursor (buffer, " Disconnected!\n\n", -1);
     if (!child)
     {
         libevdev_uinput_destroy(uidev);
@@ -82,7 +83,8 @@ void Input::tick()
 
 void Input::init()
 {
-    std::cout << name << " Connected!" << std::endl;
+    gtk_text_buffer_insert_at_cursor (buffer, name.c_str(), -1);
+    gtk_text_buffer_insert_at_cursor (buffer, " Connected!\n", -1);
     std::string dev_name = name + " - CHMapper";
     struct libevdev *evdev;
     evdev = libevdev_new();
@@ -102,22 +104,25 @@ void Input::init()
     int err = libevdev_uinput_create_from_device(evdev,
                                                  LIBEVDEV_UINPUT_OPEN_MANAGED,
                                                  &uidev);
+                                                 
+    
+
     if (err == -ENOENT)
     {
-        std::cout << "Unable to communicate with uinput module, attempting to enable." << std::endl;
-        system("sudo modprobe uinput");
-        int err = libevdev_uinput_create_from_device(evdev,
-                                                     LIBEVDEV_UINPUT_OPEN_MANAGED,
-                                                     &uidev);
-        if (err == -ENOENT)
-        {
-            std::cout << "Unable to automatically load uinput, please install it and then run sudo modprobe uinput" << std::endl;
-        }
-    }
-    if (err != 0)
+        gtk_text_buffer_insert_at_cursor (buffer, "The was a problem creating a virtual controller, the below command may help:\n", -1);
+        gtk_text_buffer_insert_at_cursor (buffer, "sudo modprobe uinput\n\n", -1);
+    } else if (err == -EACCES)
     {
-        throw DeviceException(
-            strerror(-err) + std::string(": Failed creating virtual device ") + dev_name + ".");
+        gtk_text_buffer_insert_at_cursor (buffer, "The was a problem creating a virtual controller, the below commands may help: \n", -1);
+        gtk_text_buffer_insert_at_cursor (buffer, "sudo echo 'KERNEL==\"uinput\", MODE=\"0666\"' > /etc/udev/rules.d/50-uinput.rules\n", -1);
+        gtk_text_buffer_insert_at_cursor (buffer, "sudo udevadm control --reload-rules`\n", -1);
+        gtk_text_buffer_insert_at_cursor (buffer, "sudo udevadm trigger\n\n", -1);
+    } else if (err != 0)
+    {
+        gtk_text_buffer_insert_at_cursor (buffer, strerror(-err), -1);
+        gtk_text_buffer_insert_at_cursor (buffer, ": Failed creating virtual device ", -1);
+        gtk_text_buffer_insert_at_cursor (buffer, dev_name.c_str(), -1);
+        gtk_text_buffer_insert_at_cursor (buffer, ".\n\n", -1);
     }
 }
 bool Input::has_children()

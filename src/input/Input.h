@@ -5,12 +5,14 @@
 #include <string>
 #include <map>
 #include <functional>
+#include <gtk/gtk.h>
 class Input
 {
 public:
-    Input(std::string name, std::string dev, struct libevdev *_dev);
+    Input(GtkTextBuffer *buffer, std::string name, std::string dev, struct libevdev *_dev);
     //used by wii extensions
-    Input(std::string name, std::string dev, struct libevdev *_dev, struct libevdev_uinput *uidev);
+    Input(GtkTextBuffer *buffer, std::string name, std::string dev, struct libevdev *_dev, struct libevdev_uinput *uidev); 
+    GtkTextBuffer *buffer;
     std::string dev;
     std::string name;
     bool child;

@@ -1,6 +1,5 @@
 #include "scanner.h"
 #include <libudev.h>
-#include <libevdev-1.0/libevdev/libevdev.h>
 #include <iostream>
 #include <algorithm>
 #include "DeviceException.h"
@@ -10,7 +9,7 @@
 #include "input/PS3.h"
 #include "input/Raphnet.h"
 #include <string.h>
-Scanner::Scanner()
+Scanner::Scanner(GtkTextBuffer *buffer): buffer(buffer)
 {
     struct udev *udev = udev_new();
     if (!udev)
@@ -54,7 +53,7 @@ void Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
         auto devBth = udev_device_get_syspath(udev_device_get_parent(udev_device_get_parent(dev)));
         if (inBth != nullptr && devBth != nullptr && std::string(inBth) == devBth)
         {
-            Input *c = new Input("unknown", sysname, _dev, in->uidev);
+            Input *c = new Input(buffer, "unknown", sysname, _dev, in->uidev);
             in->add_child(c);
             inputs->push_back(c);
             return;
@@ -66,37 +65,37 @@ void Scanner::construct(udev_device *dev, std::list<Input *> *inputs)
     Input *input = nullptr;
     if (found_name == "Nintendo Wii Remote")
     {
-        input = new WiiController("Wii Remote", sysname, _dev);
+        input = new WiiController(buffer, "Wii Remote", sysname, _dev);
     }
     if (vid == 0x289b && pid == 0x002b)
     {
-        input = new Raphnet("Raphnet wusbmote", sysname, _dev);
+        input = new Raphnet(buffer, "Raphnet wusbmote", sysname, _dev);
     }
     if (vid == 0x1430 && pid == 0x474c)
     {
-        input = new PS3("World Tour PC Guitar", sysname, _dev);
+        input = new PS3(buffer, "World Tour PC Guitar", sysname, _dev);
     }
     if (vid == 0x12ba)
     {
         if (pid == 0x0210)
         {
-            input = new PS3("PS3 Rock Band Drum Kit", sysname, _dev);
+            input = new PS3(buffer, "PS3 Rock Band Drum Kit", sysname, _dev);
         }
         else if (pid == 0x0200)
         {
-            input = new PS3("PS3 Rock Band Guitar", sysname, _dev);
+            input = new PS3(buffer, "PS3 Rock Band Guitar", sysname, _dev);
         }
         else if (pid == 0x0100)
         {
-            input = new PS3("PS3 Guitar Hero Guitar", sysname, _dev);
+            input = new PS3(buffer, "PS3 Guitar Hero Guitar", sysname, _dev);
         }
         else if (pid == 0x0120)
         {
-            input = new PS3("PS3 Guitar Hero Drum Kit", sysname, _dev);
+            input = new PS3(buffer, "PS3 Guitar Hero Drum Kit", sysname, _dev);
         }
         else
         {
-            input = new PS3("PS3 Controller", sysname, _dev);
+            input = new PS3(buffer, "PS3 Controller", sysname, _dev);
         }
     }
     // construct and then call init function
