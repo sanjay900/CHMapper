@@ -15,6 +15,7 @@ GtkWidget *window;
 Scanner *scanner = nullptr;
 guint tag;
 std::list<Input *> inputs;
+bool canStart = false;
 static gboolean
 on_timeout (gpointer user_data) {
     scanner->findNew(&inputs);
@@ -25,17 +26,23 @@ on_timeout (gpointer user_data) {
 }
 void startScanning (GtkWidget *widget, gpointer *data)
 {
-    gtk_text_buffer_insert_at_cursor (buffer, "Started CHMapper, waiting for a Wii Guitar, PS3 Guitar or Raphnet Guitar\n\n", -1);
-    scanner = new Scanner(buffer);
-    scanner->scan(&inputs);
-    //Scan twice, once to pick up wiimotes, and once to pick up their extensions.
-    scanner->scan(&inputs);
-    tag = g_timeout_add (100, on_timeout, window);
+    if(scanner == nullptr && canStart) {
+        GtkTextIter iter;
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, "Started CHMapper, waiting for a Wii Guitar, PS3 Guitar or Raphnet Guitar\n\n", -1);
+        scanner = new Scanner(buffer);
+        scanner->scan(&inputs);
+        //Scan twice, once to pick up wiimotes, and once to pick up their extensions.
+        scanner->scan(&inputs);
+        tag = g_timeout_add (1, on_timeout, window);
+    }
 }
 void stopScanning (GtkWidget *widget, gpointer *data)
 {
-    gtk_text_buffer_insert_at_cursor (buffer, "Stopping CHMapper\n", -1);
     if(scanner != nullptr) {
+        GtkTextIter iter;
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, "Stopping CHMapper\n", -1);
         for (auto in: inputs) {
             in->disconnect();
         }
@@ -55,6 +62,7 @@ activate(GtkApplication *app,
 
     view = gtk_text_view_new ();
     gtk_text_view_set_editable(GTK_TEXT_VIEW(view), false);
+    gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(view), false);
 
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
     gtk_text_buffer_insert_at_cursor (buffer, "Click Start to start CHMapper\n", -1);
@@ -89,11 +97,13 @@ activate(GtkApplication *app,
     } else if (err == -EACCES)
     {
         gtk_text_buffer_insert_at_cursor (buffer, "There was a problem testing the creation of a virtual controller, the below commands may help: \n", -1);
-        gtk_text_buffer_insert_at_cursor (buffer, "sudo echo 'KERNEL==\"uinput\", MODE=\"0666\"' > /etc/udev/rules.d/50-uinput.rules\n", -1);
-        gtk_text_buffer_insert_at_cursor (buffer, "sudo udevadm control --reload-rules`\n", -1);
+        gtk_text_buffer_insert_at_cursor (buffer, "sudo modprobe uinput\n\n", -1);
+        gtk_text_buffer_insert_at_cursor (buffer, "echo 'KERNEL==\"uinput\", MODE=\"0666\"' | sudo tee /etc/udev/rules.d/50-uinput.rules\n", -1);
+        gtk_text_buffer_insert_at_cursor (buffer, "sudo udevadm control --reload-rules\n", -1);
         gtk_text_buffer_insert_at_cursor (buffer, "sudo udevadm trigger\n\n", -1);
         return;
     } 
+    canStart = true;
 }
 
 int main(int argc, char *argv[])

@@ -21,6 +21,9 @@ void WiiController::add_child(Input *input)
         return;
     }
     
+    GtkTextIter iter;
+    gtk_text_buffer_get_end_iter(buffer, &iter);
+    gtk_text_buffer_insert (buffer, &iter, "Started CHMapper, waiting for Wii Guitar, PS3 Guitar or Raphnet Guitar", -1);
     std::cout << (input->name) << " Connected!" << std::endl;
     extension = input;
     isGuitar = found_ext == "Guitar";

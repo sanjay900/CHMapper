@@ -18,8 +18,11 @@ Input::Input(GtkTextBuffer *buffer, std::string name, std::string dev, struct li
 }
 void Input::disconnect()
 {
-    gtk_text_buffer_insert_at_cursor (buffer, name.c_str(), -1);
-    gtk_text_buffer_insert_at_cursor (buffer, " Disconnected!\n", -1);
+    GtkTextIter iter;
+    gtk_text_buffer_get_end_iter(buffer, &iter);
+    gtk_text_buffer_insert (buffer, &iter, name.c_str(), -1);
+    gtk_text_buffer_get_end_iter(buffer, &iter);
+    gtk_text_buffer_insert (buffer, &iter, " Disconnected!\n", -1);
     if (!child)
     {
         libevdev_uinput_destroy(uidev);
@@ -83,8 +86,11 @@ void Input::tick()
 
 void Input::init()
 {
-    gtk_text_buffer_insert_at_cursor (buffer, name.c_str(), -1);
-    gtk_text_buffer_insert_at_cursor (buffer, " Connected!\n", -1);
+    GtkTextIter iter;
+    gtk_text_buffer_get_end_iter(buffer, &iter);
+    gtk_text_buffer_insert (buffer, &iter, name.c_str(), -1);
+    gtk_text_buffer_get_end_iter(buffer, &iter);
+    gtk_text_buffer_insert (buffer, &iter, " Connected!\n", -1);
     std::string dev_name = name + " - CHMapper";
     struct libevdev *evdev;
     evdev = libevdev_new();
@@ -106,10 +112,14 @@ void Input::init()
                                                  &uidev);                                             
     if (err != 0)
     {
-        gtk_text_buffer_insert_at_cursor (buffer, strerror(-err), -1);
-        gtk_text_buffer_insert_at_cursor (buffer, ": Failed creating virtual device ", -1);
-        gtk_text_buffer_insert_at_cursor (buffer, dev_name.c_str(), -1);
-        gtk_text_buffer_insert_at_cursor (buffer, ".\n\n", -1);
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, strerror(-err), -1);
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, ": Failed creating virtual device ", -1);
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, dev_name.c_str(), -1);
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, ".\n\n", -1);
     }
 }
 bool Input::has_children()
