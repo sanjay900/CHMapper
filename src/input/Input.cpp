@@ -18,11 +18,16 @@ Input::Input(GtkTextBuffer *buffer, std::string name, std::string dev, struct li
 }
 void Input::disconnect()
 {
-    GtkTextIter iter;
-    gtk_text_buffer_get_end_iter(buffer, &iter);
-    gtk_text_buffer_insert (buffer, &iter, name.c_str(), -1);
-    gtk_text_buffer_get_end_iter(buffer, &iter);
-    gtk_text_buffer_insert (buffer, &iter, " Disconnected!\n", -1);
+
+    if (buffer != nullptr) {
+        GtkTextIter iter;
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, name.c_str(), -1);
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, " Disconnected!\n", -1);
+    } else {
+        std::cout << name << " Disconnected!" << std::endl;
+    }
     if (!child)
     {
         libevdev_uinput_destroy(uidev);
@@ -86,11 +91,15 @@ void Input::tick()
 
 void Input::init()
 {
-    GtkTextIter iter;
-    gtk_text_buffer_get_end_iter(buffer, &iter);
-    gtk_text_buffer_insert (buffer, &iter, name.c_str(), -1);
-    gtk_text_buffer_get_end_iter(buffer, &iter);
-    gtk_text_buffer_insert (buffer, &iter, " Connected!\n", -1);
+    if (buffer != nullptr) {
+        GtkTextIter iter;
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, name.c_str(), -1);
+        gtk_text_buffer_get_end_iter(buffer, &iter);
+        gtk_text_buffer_insert (buffer, &iter, " Connected!\n", -1);
+    } else {
+        std::cout << name << " Connected!" << std::endl;
+    }
     std::string dev_name = name + " - CHMapper";
     struct libevdev *evdev;
     evdev = libevdev_new();
@@ -112,14 +121,20 @@ void Input::init()
                                                  &uidev);                                             
     if (err != 0)
     {
-        gtk_text_buffer_get_end_iter(buffer, &iter);
-        gtk_text_buffer_insert (buffer, &iter, strerror(-err), -1);
-        gtk_text_buffer_get_end_iter(buffer, &iter);
-        gtk_text_buffer_insert (buffer, &iter, ": Failed creating virtual device ", -1);
-        gtk_text_buffer_get_end_iter(buffer, &iter);
-        gtk_text_buffer_insert (buffer, &iter, dev_name.c_str(), -1);
-        gtk_text_buffer_get_end_iter(buffer, &iter);
-        gtk_text_buffer_insert (buffer, &iter, ".\n\n", -1);
+
+        if (buffer != nullptr) {
+            GtkTextIter iter;
+            gtk_text_buffer_get_end_iter(buffer, &iter);
+            gtk_text_buffer_insert (buffer, &iter, strerror(-err), -1);
+            gtk_text_buffer_get_end_iter(buffer, &iter);
+            gtk_text_buffer_insert (buffer, &iter, ": Failed creating virtual device ", -1);
+            gtk_text_buffer_get_end_iter(buffer, &iter);
+            gtk_text_buffer_insert (buffer, &iter, dev_name.c_str(), -1);
+            gtk_text_buffer_get_end_iter(buffer, &iter);
+            gtk_text_buffer_insert (buffer, &iter, ".\n\n", -1);
+        } else {
+            std::cout << strerror(-err) << ": Failed creating virtual device " << dev_name.c_str() << ".\n" << std::endl;
+        }
     }
 }
 bool Input::has_children()

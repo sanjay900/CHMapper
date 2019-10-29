@@ -34,7 +34,7 @@ void startScanning (GtkWidget *widget, gpointer *data)
         scanner->scan(&inputs);
         //Scan twice, once to pick up wiimotes, and once to pick up their extensions.
         scanner->scan(&inputs);
-        tag = g_timeout_add (1, on_timeout, window);
+        tag = g_idle_add (on_timeout, NULL);
     }
 }
 void stopScanning (GtkWidget *widget, gpointer *data)
@@ -108,6 +108,19 @@ activate(GtkApplication *app,
 
 int main(int argc, char *argv[])
 {
+    if (argc >= 2 && strcmp(argv[1],"-c") == 0) {
+        scanner = new Scanner(buffer);
+        scanner->scan(&inputs);
+        //Scan twice, once to pick up wiimotes, and once to pick up their extensions.
+        scanner->scan(&inputs);
+        while(true) {
+            scanner->findNew(&inputs);
+            for (auto x: inputs) {
+                x->tick();
+            }
+        }
+        return 0;
+    }
     GtkApplication *app;
     int status;
 
