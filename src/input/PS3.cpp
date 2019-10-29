@@ -20,16 +20,18 @@ void PS3::init()
     
 
     buttonMap[BTN_WEST] = BTN_TL;
-    buttonMap[BTN_TL2] = BTN_SELECT;
-    buttonMap[BTN_TR2] = BTN_START;
     buttonMap[BTN_MODE] = BTN_MODE;
-    //Both of these axis should only map for guitar controllers
-    //It might not be worth fixing though, we could just make this GH only
     axisMap[ABS_Z] = ABS_RX;
+    axisMapScaled[ABS_Z] = [](int val) { return (-32767+(val*2)); };
     if (type == PS3Type::GH) {
-        axisMapScaled[ABS_Z] = [](int val) { return (-32767+(val*2)); };
+        buttonMap[BTN_SELECT] = BTN_SELECT;
+        buttonMap[BTN_START] = BTN_START;
+        axisMap[ABS_RY] = ABS_RY;
+        axisMapScaled[ABS_RY] = [](int val) { return (val * -2) - 28000; };
     }
     if (type == PS3Type::RB) {
+        buttonMap[BTN_TL2] = BTN_SELECT;
+        buttonMap[BTN_TR2] = BTN_START;
         axisMap[BTN_Z] = ABS_RY;
     }
     axisMap[ABS_HAT0X] = ABS_HAT0X;
